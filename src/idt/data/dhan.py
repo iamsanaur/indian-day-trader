@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import time
 from datetime import date, timedelta
 
@@ -10,6 +9,7 @@ import pandas as pd
 import requests
 
 from ..market import index_info, now_ist
+from . import dhan_auth
 from .base import DataError, Instrument, OptionChain, Quote, parse_candles, parse_chain
 from .instruments import Instruments
 
@@ -19,8 +19,8 @@ BASE = "https://api.dhan.co/v2"
 _SPACING = {"optionchain": 3.0, "marketfeed": 1.0, "charts": 0.25, "other": 0.25}
 
 _SETUP_HELP = ("Dhan data access failed: {msg}\n"
-               "Set DHAN_CLIENT_ID and DHAN_ACCESS_TOKEN (web.dhan.co > My Profile > Access DhanHQ APIs). "
-               "Market data APIs need an active Dhan data subscription. Tokens expire daily.")
+               "Reconnect with today's TOTP (Settings in the app, or `idt dhan login`). Needs DHAN_CLIENT_ID and "
+               "DHAN_PIN in .env and TOTP enabled on web.dhan.co. Market data APIs need a Dhan data subscription.")
 _AUTH_CODES = {"806", "807", "808", "809", "810", "DH-901", "DH-902"}
 _RETRY_CODES = {"805", "DH-904"}
 
@@ -28,18 +28,29 @@ _RETRY_CODES = {"805", "DH-904"}
 class DhanData:
     def __init__(self, instruments: Instruments, client_id: str | None = None, token: str | None = None,
                  session: requests.Session | None = None, sleep=time.sleep):
-        self.client_id = client_id or os.environ.get("DHAN_CLIENT_ID", "")
-        self.token = token or os.environ.get("DHAN_ACCESS_TOKEN", "")
-        if not (self.client_id and self.token):
-            raise DataError(_SETUP_HELP.format(msg="DHAN_CLIENT_ID / DHAN_ACCESS_TOKEN not set"))
+        # Explicit credentials (tests) win; otherwise the current TOTP session or DHAN_ACCESS_TOKEN is
+        # looked up on every request, so a token renewed mid-day is picked up without a restart.
+        self._explicit = (client_id, token) if client_id and token else None
+        self._credentials()
         self.instruments = instruments
         self.http = session or requests.Session()
         self.sleep = sleep
         self._last: dict[str, float] = {}
 
     # --- transport -------------------------------------------------------------
+    def _credentials(self) -> tuple[str, str]:
+        creds = self._explicit or dhan_auth.current_credentials()
+        if not creds:
+            raise DataError(dhan_auth.status()["message"])
+        return creds
+
+    @property
+    def client_id(self) -> str:
+        return self._credentials()[0]
+
     def _headers(self) -> dict:
-        return {"access-token": self.token, "client-id": self.client_id,
+        client_id, token = self._credentials()
+        return {"access-token": token, "client-id": client_id,
                 "Accept": "application/json", "Content-Type": "application/json"}
 
     def _throttle(self, path: str) -> None:

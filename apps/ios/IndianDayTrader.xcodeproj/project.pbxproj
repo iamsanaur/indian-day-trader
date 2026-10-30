@@ -18,6 +18,7 @@
 		AE4F6290E2B154C46B91740C /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076CAD72EAC59856BB911B22 /* Components.swift */; };
 		C1EE55F4B21099834E821BC9 /* IndianDayTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C890054187FE0D1317058C4C /* IndianDayTraderApp.swift */; };
 		C495171EBB14D2950B9AA237 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB8FE4F71AB95AEDF40BA9D /* Models.swift */; };
+		D3A9ED8BDCB589B42EC53924 /* DhanSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E2AA7BBD38BAD42AF28B288 /* DhanSessionView.swift */; };
 		D822DF8244EB4659CF9F4BC8 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 812FD47C803629EDD83820F0 /* Theme.swift */; };
 		F1C6AFF5FF09A92B503F3454 /* TradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9D73ED3E94860910744C82 /* TradeView.swift */; };
 		FDD0E502E01CF51704946092 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46804154CC94BCA66A25077A /* API.swift */; };
@@ -44,6 +45,7 @@
 		46804154CC94BCA66A25077A /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		5CB8FE4F71AB95AEDF40BA9D /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		72B1067D9F894B1F18201C30 /* IndianDayTraderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = IndianDayTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E2AA7BBD38BAD42AF28B288 /* DhanSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DhanSessionView.swift; sourceTree = "<group>"; };
 		812FD47C803629EDD83820F0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		87CA351245952CBDEE6B0D4A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		AAE9589FAFE765D3681F06C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 			children = (
 				180458E431C69836B0C86C13 /* AlertsView.swift */,
 				076CAD72EAC59856BB911B22 /* Components.swift */,
+				7E2AA7BBD38BAD42AF28B288 /* DhanSessionView.swift */,
 				323589837AC26CE2B9691915 /* MarketsView.swift */,
 				3D1B56435059615035CBDF17 /* MoreView.swift */,
 				1B48AB5A06B5E3FFC7492258 /* OptionsView.swift */,
@@ -230,6 +233,7 @@
 				FDD0E502E01CF51704946092 /* API.swift in Sources */,
 				718F35FD0E56DA7EAB2A517D /* AlertsView.swift in Sources */,
 				AE4F6290E2B154C46B91740C /* Components.swift in Sources */,
+				D3A9ED8BDCB589B42EC53924 /* DhanSessionView.swift in Sources */,
 				95454787673B490B38CC724E /* Format.swift in Sources */,
 				C1EE55F4B21099834E821BC9 /* IndianDayTraderApp.swift in Sources */,
 				3C1C12D498433CAC0EF4FE08 /* MarketsView.swift in Sources */,

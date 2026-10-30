@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..config import workspace
+from . import dhan_auth  # noqa: F401  (re-exported for service/cli)
 from .base import DataError, MarketData
 
 

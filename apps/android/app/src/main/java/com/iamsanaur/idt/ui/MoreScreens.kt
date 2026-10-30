@@ -223,6 +223,7 @@ fun SettingsScreen() {
                 ErrorBox(health.error)
             }
         }
+        item { DhanSessionCard() }
         item {
             Card("Appearance") { Segmented(app.theme, listOf("system" to "System", "light" to "Light", "dark" to "Dark"), { app.setThemePref(it) }) }
         }

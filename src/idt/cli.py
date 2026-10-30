@@ -149,6 +149,18 @@ def cmd_charges(args, cfg):
     emit(svc.charges(cfg, args.segment, args.buy, args.sell, args.exchange, args.orders))
 
 
+def cmd_dhan(args, cfg):
+    now = get_now(args)
+    if args.action == "status":
+        emit(svc.dhan_status(now))
+    elif args.action == "logout":
+        emit(svc.dhan_logout(now))
+    else:
+        import getpass
+        totp = args.totp or getpass.getpass("Dhan TOTP (6 digits): ")
+        emit(svc.dhan_login(totp, now))
+
+
 def cmd_serve(args, cfg):
     from .server.run import serve
     serve(args.host, args.port, args.demo, args.now, args.public_url)
@@ -293,6 +305,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--exchange", default="NSE", choices=["NSE", "BSE"])
     p.add_argument("--orders", type=int, default=2)
     p.set_defaults(fn=cmd_charges)
+
+    p = sub.add_parser("dhan", help="Dhan session: daily TOTP login (DHAN_CLIENT_ID + DHAN_PIN in env)")
+    p.add_argument("action", choices=["status", "login", "logout"])
+    p.add_argument("--totp", help="6-digit code from your authenticator (prompted if omitted)")
+    p.set_defaults(fn=cmd_dhan)
 
     p = sub.add_parser("serve", help="run the API server for the web/iOS/Android apps")
     p.add_argument("--host", default="0.0.0.0")

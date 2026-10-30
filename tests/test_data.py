@@ -98,16 +98,16 @@ def test_funds_misspelt_field_and_margin_fallback(inst):
 
 def test_auth_error_gives_setup_help_and_rate_limit_retries(inst):
     d, _ = dhan(inst, [FakeResp(401, {"status": "failure", "data": {"807": "Access token is expired"}})])
-    with pytest.raises(DataError, match="DHAN_ACCESS_TOKEN"):
+    with pytest.raises(DataError, match="TOTP"):
         d.funds()
     d, sess = dhan(inst, [FakeResp(429, {}), FakeResp(200, {"availabelBalance": 1.0})])
     assert d.funds()["available"] == 1.0 and len(sess.calls) == 2
 
 
-def test_missing_credentials(inst, monkeypatch):
-    monkeypatch.delenv("DHAN_CLIENT_ID", raising=False)
-    monkeypatch.delenv("DHAN_ACCESS_TOKEN", raising=False)
-    with pytest.raises(DataError, match="not set"):
+def test_missing_credentials(inst, ws, monkeypatch):
+    for k in ("DHAN_CLIENT_ID", "DHAN_ACCESS_TOKEN", "DHAN_PIN"):
+        monkeypatch.delenv(k, raising=False)
+    with pytest.raises(DataError, match="DHAN_PIN"):
         DhanData(inst)
 
 

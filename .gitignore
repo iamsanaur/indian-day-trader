@@ -24,3 +24,4 @@ deploy/cloudflared/credentials.json
 *.keystore
 signing/
 deploy/cloudflared/config.yml
+brag-output*/

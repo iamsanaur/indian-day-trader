@@ -223,6 +223,23 @@ struct AlertItem: Codable, Identifiable, Hashable {
     var observed: JSONValue?
 }
 
+struct DhanStatus: Codable, Equatable {
+    var connected: Bool
+    var source: String?
+    var clientIdSet: Bool
+    var pinSet: Bool
+    var totpLoginAvailable: Bool
+    var clientName: String?
+    var expiresAt: String?
+    var expiresInSeconds: Int?
+    var message: String
+
+    var timeLeft: String {
+        guard let s = expiresInSeconds, s > 0 else { return "" }
+        return "\(s / 3600)h \(s % 3600 / 60)m left"
+    }
+}
+
 struct Status: Codable {
     var now: String
     var phase: String
@@ -232,6 +249,7 @@ struct Status: Codable {
     var realisedToday: Double
     var limits: [String: JSONValue]
     var demo: Bool?
+    var dhan: DhanStatus?
 }
 
 struct JournalEntry: Codable, Hashable { var type: String; var ts: String; var symbol: String?; var pnl: Double?; var kind: String?; var lossAtStop: Double?; var note: String? }

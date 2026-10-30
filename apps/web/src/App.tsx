@@ -13,6 +13,7 @@ import { Alerts, useAlertStream } from "./pages/Alerts";
 import { Journal } from "./pages/Journal";
 import { Research } from "./pages/Research";
 import { Settings } from "./pages/Settings";
+import { DhanBanner, hoursLeft } from "./DhanSession";
 
 const NAV = [
   { to: "/", label: "Markets", icon: Icons.markets, end: true },
@@ -62,12 +63,14 @@ export function App() {
             <>
               <div className="row"><Badge tone={s.mode === "paper" ? "warn" : "accent"}>{s.mode}</Badge>{s.demo && <Badge>demo</Badge>}</div>
               <span>Market {s.phase} · {time(s.now)} IST</span>
+              {s.dhan && <span>Dhan {s.dhan.connected ? (s.dhan.source === "totp" ? hoursLeft(s.dhan) : "connected") : "not connected"}</span>}
             </>
           ) : <span>Not connected — open Settings</span>}
           <span>Never places orders.</span>
         </div>
       </aside>
       <main className="main">
+        {s?.dhan && <DhanBanner status={s.dhan} />}
         <Routes>
           <Route path="/" element={<Markets />} />
           <Route path="/markets/:symbol" element={<IndexDetail />} />

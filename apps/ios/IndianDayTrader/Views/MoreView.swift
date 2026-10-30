@@ -197,6 +197,8 @@ struct SettingsView: View {
                 }
             } header: { Text("Server") } footer: { Text("Run `idt serve` on your computer and scan the QR it prints, or open the idt:// link on this phone.") }
 
+            DhanSessionSection()
+
             Section("Appearance") {
                 Picker("Theme", selection: $theme) { Text("System").tag("system"); Text("Light").tag("light"); Text("Dark").tag("dark") }.pickerStyle(.segmented)
             }

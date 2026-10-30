@@ -39,6 +39,13 @@ final class DecodingTests: XCTestCase {
         XCTAssertEqual(t.exits.first?["note"], .string("stop"))
     }
 
+    func testDecodesDhanStatus() throws {
+        let json = #"{"client_id_set":true,"pin_set":true,"totp_login_available":true,"connected":true,"source":"totp","client_name":"Demo","expires_at":"2026-10-31T09:00:00+05:30","expires_in_seconds":50400,"message":"ok"}"#
+        let d = try APIClient.decoder.decode(DhanStatus.self, from: Data(json.utf8))
+        XCTAssertTrue(d.totpLoginAvailable)
+        XCTAssertEqual(d.timeLeft, "14h 0m left")
+    }
+
     func testCurveAllowsNulls() throws {
         let json = #"{"x":[1,2,null],"expiry":[0,1,null],"today":[0,0.5,null]}"#
         let c = try APIClient.decoder.decode(Curve.self, from: Data(json.utf8))

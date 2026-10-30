@@ -169,14 +169,25 @@ idt init                   # creates idt/config.json and idt/watchlist.json
 
 ### 2. Connect market data (Dhan)
 
+Put your client ID and PIN in `.env` (or export them), then connect once a day with the 6-digit TOTP from
+your authenticator app:
+
 ```bash
-export DHAN_CLIENT_ID=1000000000
-export DHAN_ACCESS_TOKEN=eyJ...    # web.dhan.co → My Profile → Access DhanHQ APIs
+DHAN_CLIENT_ID=1000000000
+DHAN_PIN=123456
+
+idt dhan login            # prompts for today's TOTP → 24-hour token, stored in idt/dhan_token.json (0600)
+idt dhan status           # connected · 13h 42m left
 ```
 
+In the apps, the same thing is in **Settings › Dhan session**, and a "Connect Dhan for today" banner appears
+whenever the token has expired. The TOTP is used once and never stored. Enable TOTP first at
+web.dhan.co › DhanHQ Trading APIs › Setup TOTP. If you prefer, `DHAN_ACCESS_TOKEN` can hold a token
+generated on Dhan Web instead.
+
 > [!NOTE]
-> Dhan access tokens expire daily, and the historical, quote and option-chain APIs need Dhan's data
-> subscription. Only **read** endpoints are called, and this code contains no order-placement code.
+> The historical, quote and option-chain APIs need Dhan's data subscription. Only **read** endpoints are
+> called, and this code contains no order-placement code.
 
 ### 3. Add the skills to Claude Code
 
@@ -254,12 +265,13 @@ idt serve --demo          # no Dhan account needed: fixtures, clock pinned to 29
 ### Docker + Cloudflare Tunnel
 
 ```bash
-cp .env.example .env            # DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN, IDT_PUBLIC_URL
+cp .env.example .env            # DHAN_CLIENT_ID, DHAN_PIN, IDT_PUBLIC_URL
 cloudflared tunnel create --credentials-file deploy/cloudflared/credentials.json indian-day-trader
 cloudflared tunnel route dns <TUNNEL_ID> daytrader.example.com
 cp deploy/cloudflared/config.example.yml deploy/cloudflared/config.yml   # fill in the ID + hostname
 docker compose up -d --build
 docker compose logs api | grep "Web app"                                  # your https link + token
+docker compose exec api idt dhan login                                   # or use Settings › Dhan session
 ```
 
 The API listens only on `127.0.0.1:8742`. The public path is the tunnel, which serves HTTPS from
@@ -377,6 +389,7 @@ Targets: `1.5R`, `pct:N`, `price:X`, `maxprofit-pct:N`, `credit-pct:N`, `pnl:X`.
 
 ```
 idt init | status
+idt dhan status | login [--totp 123456] | logout
 idt index [SYMBOL] [--interval 1|5|15|25|60] [--days N] [--html] [--future]
 idt expiries UNDERLYING
 idt chain UNDERLYING [--expiry near|next|monthly|YYYY-MM-DD] [--strikes N] [--chart]

@@ -60,8 +60,10 @@ fun ModeBadges() {
 fun MarketsScreen(open: (String) -> Unit) {
     val app = LocalApp.current
     val board = rememberLoad<JSONObject>()
-    LaunchedEffect(app.conn) { board.run { app.api.obj("/indices") } }
+    val dhanConnected = app.status?.optJSONObject("dhan")?.optBoolean("connected")
+    LaunchedEffect(app.conn, dhanConnected) { app.refreshStatus(); board.run { app.api.obj("/indices") } }
     Screen("Markets", actions = { ModeBadges() }) {
+        item { DhanBanner() }
         item { ErrorBox(board.error) }
         board.value?.o("indices")?.let { idx ->
             INDEX_NAMES.keys.filter { idx.has(it) }.forEach { sym ->

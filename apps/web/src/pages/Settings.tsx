@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, getConnection, saveConnection } from "../lib/api";
 import { Badge, Card, ErrorBox, PageHead, Seg } from "../ui";
+import { DhanCardBody } from "../DhanSession";
+import type { Status } from "../lib/types";
 
 type Theme = "system" | "light" | "dark";
 
@@ -33,6 +35,7 @@ export function Settings() {
   const [draft, setDraft] = useState<Record<string, string | number | boolean>>({});
   const health = useQuery({ queryKey: ["health", conn.url], queryFn: () => api<{ ok: boolean; version: string; demo: boolean; now: string }>("/health"), retry: false });
   const cfg = useQuery({ queryKey: ["config"], queryFn: () => api<Config>("/config"), retry: false });
+  const status = useQuery({ queryKey: ["status"], queryFn: () => api<Status>("/status"), retry: false });
   useEffect(() => { if (cfg.data) setDraft(cfg.data.config); }, [cfg.data]);
   const save = useMutation({
     mutationFn: (changes: object) => api<Config>("/config", { method: "PATCH", json: changes }),
@@ -52,6 +55,7 @@ export function Settings() {
             <ErrorBox error={cfg.error} />
           </div>
         </Card>
+        {status.data?.dhan && <Card title="Dhan session"><DhanCardBody status={status.data.dhan} /></Card>}
         <Card title="Appearance">
           <Seg value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }} options={[{ value: "system", label: "System" }, { value: "light", label: "Light" }, { value: "dark", label: "Dark" }]} />
         </Card>

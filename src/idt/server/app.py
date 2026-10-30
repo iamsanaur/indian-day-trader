@@ -90,6 +90,10 @@ class CloseBody(BaseModel):
     note: str | None = None
 
 
+class TotpBody(BaseModel):
+    totp: str
+
+
 class AlertBody(BaseModel):
     from_plan: bool = False
     symbol: str | None = None
@@ -147,6 +151,18 @@ def create_app(clock: Callable[[], datetime] | None = None, demo: bool = False) 
     @app.patch(f"{api}/config", dependencies=guard)
     def patch_config(changes: dict):
         return ok(svc.update_config(changes))
+
+    @app.get(f"{api}/dhan", dependencies=guard)
+    def dhan_status():
+        return ok(svc.dhan_status(clock()))
+
+    @app.post(f"{api}/dhan/login", dependencies=guard)
+    def dhan_login(body: TotpBody):
+        return ok(svc.dhan_login(body.totp, clock()))
+
+    @app.delete(f"{api}/dhan", dependencies=guard)
+    def dhan_logout():
+        return ok(svc.dhan_logout(clock()))
 
     @app.get(f"{api}/indices", dependencies=guard)
     def indices():

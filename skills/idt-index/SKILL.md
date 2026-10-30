@@ -35,5 +35,6 @@ change the picture. Mention INDIA VIX from the board when discussing option prem
 ## Setup
 
 `idt` must be on PATH (`uv tool install <path-to-indian-day-trader>` or `pip install -e .`).
-Dhan: `DHAN_CLIENT_ID` and `DHAN_ACCESS_TOKEN` env vars (token expires daily). If a command
-returns `{"error": ...}`, relay the setup instructions in it. `idt init` creates `idt/config.json`.
+Dhan: `DHAN_CLIENT_ID` and `DHAN_PIN` in the environment, then `idt dhan login` once a day with the
+user's 6-digit TOTP (ask them for it; never store it). `idt dhan status` shows the time left. If a command
+returns `{"error": ...}`, relay the instructions in it. `idt init` creates `idt/config.json`.

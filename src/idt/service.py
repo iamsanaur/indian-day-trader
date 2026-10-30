@@ -24,7 +24,7 @@ from . import strategy as strat_mod
 from . import ticket as ticket_mod
 from . import timemachine as tm
 from .config import DEFAULTS, append_journal, load_config, load_state, read_journal, save_state, workspace
-from .data import DataError, get_nse
+from .data import DataError, dhan_auth, get_nse
 from .market import IST, INDICES, at, index_info, phase
 
 MAIN_INDICES = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "INDIAVIX"]
@@ -110,7 +110,8 @@ def status(cfg: dict, now: datetime) -> dict:
             "realised_today": sum(float(e.get("pnl", 0)) for e in closes),
             "limits": {k: cfg[k] for k in ("capital", "max_loss_per_trade", "daily_loss_cap", "max_trades_per_day",
                                            "allow_short", "allow_naked")},
-            "files": sorted(p.name for p in workspace().glob("*.json"))}
+            "files": sorted(p.name for p in workspace().glob("*.json") if p.name not in ("server.json", "dhan_token.json")),
+            "dhan": dhan_auth.status(now) if cfg["data_provider"] == "dhan" else None}
 
 
 def get_config(cfg: dict) -> dict:
@@ -128,6 +129,21 @@ def update_config(changes: dict) -> dict:
     current.update(changes)
     save_state("config.json", current)
     return get_config(load_config())
+
+
+# --- Dhan session ---------------------------------------------------------------------
+
+def dhan_status(now: datetime) -> dict:
+    return dhan_auth.status(now)
+
+
+def dhan_login(totp: str, now: datetime) -> dict:
+    return dhan_auth.login(totp, now=now)
+
+
+def dhan_logout(now: datetime) -> dict:
+    dhan_auth.clear_session()
+    return dhan_auth.status(now)
 
 
 # --- markets ---------------------------------------------------------------------------

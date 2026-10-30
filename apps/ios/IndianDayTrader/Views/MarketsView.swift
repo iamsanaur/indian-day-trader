@@ -15,6 +15,7 @@ struct MarketsView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 14) {
+                    DhanBanner()
                     ErrorBanner(error: board.error)
                     if let b = board.value {
                         ForEach(boardOrder.filter { b.indices[$0] != nil }, id: \.self) { sym in
@@ -33,10 +34,14 @@ struct MarketsView: View {
             .navigationDestination(for: String.self) { IndexDetailView(symbol: $0) }
             .refreshable { await load() }
             .task { await load() }
+            .onChange(of: app.status?.dhan?.connected) { _, connected in if connected == true { Task { await load() } } }
         }
     }
 
-    func load() async { await board.run { try await app.api.call("/indices") } }
+    func load() async {
+        await app.refreshStatus()
+        await board.run { try await app.api.call("/indices") }
+    }
 }
 
 struct ModeBadge: View {

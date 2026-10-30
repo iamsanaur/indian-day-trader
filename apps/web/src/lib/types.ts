@@ -203,6 +203,18 @@ export interface Alert {
   observed?: number | string;
 }
 
+export interface DhanStatus {
+  connected: boolean;
+  source: "env" | "totp" | null;
+  client_id_set: boolean;
+  pin_set: boolean;
+  totp_login_available: boolean;
+  client_name?: string | null;
+  expires_at: string | null;
+  expires_in_seconds: number | null;
+  message: string;
+}
+
 export interface Status {
   now: string;
   phase: string;
@@ -212,6 +224,7 @@ export interface Status {
   realised_today: number;
   limits: Record<string, number | boolean>;
   demo?: boolean;
+  dhan?: DhanStatus | null;
 }
 
 export interface JournalEntry {

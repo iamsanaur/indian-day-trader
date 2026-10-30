@@ -3,7 +3,8 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    IDT_HOME=/data
+    IDT_HOME=/data \
+    MPLCONFIGDIR=/tmp/matplotlib
 
 WORKDIR /app
 COPY pyproject.toml README.md ./
