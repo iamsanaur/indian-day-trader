@@ -6,9 +6,10 @@
 
 [![CI](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml/badge.svg)](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-51%20passing-1a9c5b)
+![Tests](https://img.shields.io/badge/tests-58%20passing-1a9c5b)
 ![Apps](https://img.shields.io/badge/apps-web%20·%20iOS%20·%20Android-4f46e5)
 ![Data](https://img.shields.io/badge/data-Dhan%20v2%20API-5b4bff)
+[![Release](https://img.shields.io/github/v/release/iamsanaur/indian-day-trader?color=4f46e5)](https://github.com/iamsanaur/indian-day-trader/releases/latest)
 ![Orders](https://img.shields.io/badge/places%20orders-never-d64545)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
@@ -279,7 +280,14 @@ Cloudflare's edge. State (config, journal, token) lives in the `idt-data` volume
 
 ### Install the apps
 
-Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases):
+Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases/latest)
+(currently **v0.1.1**, with the Dhan TOTP login):
+
+- **Android**: `IndianDayTrader-0.1.1.apk` (Android 8.0+). Allow installs from unknown sources, then open it. It is signed with the same
+  key as v0.1.0, so it installs as an update.
+- **iOS**: `IndianDayTrader-0.1.1-adhoc.ipa` (iOS 17+). This is an Ad Hoc build, so it installs only on devices registered
+  to the developer team (via Apple Configurator, Xcode › Devices, or an OTA link). Everyone else should build from source.
+- Verify downloads against `SHA256SUMS.txt` in the release.
 
 - **Android**: `IndianDayTrader-<version>.apk`. Allow installs from unknown sources, then open it.
 - **iOS**: `IndianDayTrader-<version>-adhoc.ipa`. This is an Ad Hoc build, so it installs only on devices registered
@@ -539,7 +547,7 @@ implement the `MarketData` protocol in one file.
 
 ```bash
 uv pip install -e ".[dev]"
-pytest -q                                   # 51 tests, offline, about a second
+pytest -q                                   # 58 tests, offline, a few seconds
 python tests/fixtures/make_fixtures.py      # regenerate deterministic fixtures
 ```
 

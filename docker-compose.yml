@@ -4,7 +4,7 @@
 services:
   api:
     build: .
-    image: indian-day-trader:0.1.0
+    image: indian-day-trader:0.1.1
     restart: unless-stopped
     env_file: .env               # DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN (never committed)
     environment:
