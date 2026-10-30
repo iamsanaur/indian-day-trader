@@ -4,4 +4,4 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 # user workspace: config, plans, orders, journal, cache, charts
-idt/
+/idt/
