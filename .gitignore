@@ -16,3 +16,11 @@ apps/android/build/
 apps/android/app/build/
 apps/android/local.properties
 .DS_Store
+
+# secrets
+.env
+deploy/cloudflared/credentials.json
+*.jks
+*.keystore
+signing/
+deploy/cloudflared/config.yml

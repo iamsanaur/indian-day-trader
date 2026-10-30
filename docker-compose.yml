@@ -1,0 +1,28 @@
+# docker compose up -d --build
+#   api     the idt API + web app (state in the idt-data volume)
+#   tunnel  Cloudflare tunnel publishing the API (see deploy/cloudflared/config.example.yml)
+services:
+  api:
+    build: .
+    image: indian-day-trader:0.1.0
+    restart: unless-stopped
+    env_file: .env               # DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN (never committed)
+    environment:
+      IDT_PUBLIC_URL: ${IDT_PUBLIC_URL:-}
+    volumes:
+      - idt-data:/data
+    ports:
+      - "127.0.0.1:8742:8742"    # local access only; the public path is the tunnel
+
+  tunnel:
+    image: cloudflare/cloudflared:2026.10.0
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./deploy/cloudflared:/etc/cloudflared:ro
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  idt-data:

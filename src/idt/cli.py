@@ -151,7 +151,7 @@ def cmd_charges(args, cfg):
 
 def cmd_serve(args, cfg):
     from .server.run import serve
-    serve(args.host, args.port, args.demo, args.now)
+    serve(args.host, args.port, args.demo, args.now, args.public_url)
 
 
 # --- parser --------------------------------------------------------------------------
@@ -298,6 +298,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--host", default="0.0.0.0")
     p.add_argument("--port", type=int, default=8742)
     p.add_argument("--demo", action="store_true", help="offline fixtures, clock pinned to 2026-10-29 09:45 IST")
+    p.add_argument("--public-url", help="URL phones should use, e.g. https://daytrader.example.com (or IDT_PUBLIC_URL)")
     p.set_defaults(fn=cmd_serve)
     return ap
 

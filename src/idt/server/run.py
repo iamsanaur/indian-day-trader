@@ -24,7 +24,7 @@ def pairing_uri(url: str, token: str) -> str:
     return f"idt://pair?u={quote(url, safe='')}&t={quote(token, safe='')}"
 
 
-def serve(host: str, port: int, demo: bool, now: str | None) -> None:
+def serve(host: str, port: int, demo: bool, now: str | None, public_url: str | None = None) -> None:
     try:
         import uvicorn
     except ImportError:
@@ -43,7 +43,7 @@ def serve(host: str, port: int, demo: bool, now: str | None) -> None:
 
     svc.init()
     token = server_token()
-    url = f"http://{lan_ip() if host == '0.0.0.0' else host}:{port}"
+    url = (public_url or os.environ.get("IDT_PUBLIC_URL") or f"http://{lan_ip() if host == '0.0.0.0' else host}:{port}").rstrip("/")
     uri = pairing_uri(url, token)
     print(f"\n  Indian Day Trader API {'(DEMO: fixtures, clock pinned to ' + now + ' IST)' if demo else ''}")
     print(f"  Web app:   {url}/?token={token}")

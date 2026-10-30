@@ -1,0 +1,10 @@
+# Copy to config.yml (git-ignored) after:
+#   cloudflared tunnel create --credentials-file deploy/cloudflared/credentials.json indian-day-trader
+#   cloudflared tunnel route dns <TUNNEL_ID> <your-hostname>
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: daytrader.example.com
+    service: http://api:8742
+  - service: http_status:404

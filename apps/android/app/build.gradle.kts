@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -16,8 +18,24 @@ android {
         versionName = "0.1.0"
     }
 
+    // Release signing: ../../signing/keystore.properties (git-ignored) or IDT_KEYSTORE_* env vars in CI.
+    val keystoreProps = Properties().apply {
+        val f = rootProject.file("../../signing/keystore.properties")
+        if (f.exists()) f.inputStream().use { load(it) }
+    }
+    val storePath = keystoreProps.getProperty("storeFile") ?: System.getenv("IDT_KEYSTORE_FILE")
+    signingConfigs {
+        if (storePath != null) create("release") {
+            storeFile = file(storePath)
+            storePassword = keystoreProps.getProperty("storePassword") ?: System.getenv("IDT_KEYSTORE_PASSWORD")
+            keyAlias = keystoreProps.getProperty("keyAlias") ?: System.getenv("IDT_KEY_ALIAS") ?: "idt"
+            keyPassword = keystoreProps.getProperty("keyPassword") ?: System.getenv("IDT_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }

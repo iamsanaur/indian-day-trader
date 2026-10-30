@@ -250,6 +250,29 @@ idt serve --demo          # no Dhan account needed: fixtures, clock pinned to 29
 - **Android** (8.0+): `cd apps/android && ./gradlew installDebug`. Point the phone camera at the QR, and the
   `idt://pair` deep link pairs the app. The emulator reaches your Mac at `http://10.0.2.2:8742`.
 
+
+### Docker + Cloudflare Tunnel
+
+```bash
+cp .env.example .env            # DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN, IDT_PUBLIC_URL
+cloudflared tunnel create --credentials-file deploy/cloudflared/credentials.json indian-day-trader
+cloudflared tunnel route dns <TUNNEL_ID> daytrader.example.com
+cp deploy/cloudflared/config.example.yml deploy/cloudflared/config.yml   # fill in the ID + hostname
+docker compose up -d --build
+docker compose logs api | grep "Web app"                                  # your https link + token
+```
+
+The API listens only on `127.0.0.1:8742`. The public path is the tunnel, which serves HTTPS from
+Cloudflare's edge. State (config, journal, token) lives in the `idt-data` volume.
+
+### Install the apps
+
+Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases):
+
+- **Android**: `IndianDayTrader-<version>.apk`. Allow installs from unknown sources, then open it.
+- **iOS**: `IndianDayTrader-<version>-adhoc.ipa`. This is an Ad Hoc build, so it installs only on devices registered
+  to the developer team (via Apple Configurator, Xcode › Devices, or an OTA link). Everyone else should build from source.
+
 > [!IMPORTANT]
 > The server binds to your LAN with token auth over plain HTTP, which is meant for a home network or VPN
 > (for example Tailscale). Put it behind HTTPS before exposing it to the internet. Rotate the token by
