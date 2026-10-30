@@ -6,7 +6,8 @@
 
 [![CI](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml/badge.svg)](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-44%20passing-1a9c5b)
+![Tests](https://img.shields.io/badge/tests-51%20passing-1a9c5b)
+![Apps](https://img.shields.io/badge/apps-web%20·%20iOS%20·%20Android-4f46e5)
 ![Data](https://img.shields.io/badge/data-Dhan%20v2%20API-5b4bff)
 ![Orders](https://img.shields.io/badge/places%20orders-never-d64545)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
@@ -28,6 +29,7 @@
 - [What you get](#-what-you-get)
 - [How a trade flows](#-how-a-trade-flows)
 - [Quick start](#-quick-start)
+- [Web, iOS & Android apps](#-web-ios--android-apps)
 - [Worked example](#-worked-example-nifty-orb--bull-call-spread)
 - [Skills reference](#-skills-reference)
 - [Option selling](#-option-selling)
@@ -199,6 +201,74 @@ The repo ships with deterministic fixtures, so you can run the whole pipeline wi
 export IDT_FIXTURES=tests/fixtures/data
 idt --now "2026-10-29 09:45" index NIFTY
 ```
+
+---
+
+## 📱 Web, iOS & Android apps
+
+The same workflow is also available outside Claude. `idt serve` runs a small **self-hosted API** on your
+own computer or VPS, and three native clients talk to it. Your Dhan keys stay on your server.
+
+<div align="center">
+<img src="docs/images/web-strategy.png" alt="Web app: strategy builder with payoff chart" width="100%">
+</div>
+
+<table>
+<tr>
+<td align="center"><b>iOS · SwiftUI</b></td>
+<td align="center"><b>Android · Jetpack Compose</b></td>
+<td align="center"><b>Web · dark mode</b></td>
+</tr>
+<tr>
+<td><img src="docs/images/ios-options.png" alt="iOS option chain" width="260"></td>
+<td><img src="docs/images/and-trade.png" alt="Android trade stepper" width="260"></td>
+<td><img src="docs/images/web-mobile-dark.png" alt="Web app on a phone in dark mode" width="260"></td>
+</tr>
+</table>
+
+| Screen | What it does |
+|---|---|
+| **Markets** | Index cards (last price, % change, day range, ORB state, trend) and a candle chart with opening range, PDH/PDL, CPR and EMAs |
+| **Options** | Expiry picker; PCR, max pain, ATM IV and expected move; OI chart; chain with OI bars and buildup |
+| **Strategy** | Templates or custom legs; payoff at expiry and today; breakevens, Greeks and margin; naked-short warning |
+| **Trade** | Setup → Plan → Odds → Size → **Risk** → Ticket. PASS/BLOCK with every check listed. You must type `yes` to confirm, and the server enforces that too |
+| **Alerts** | Stop, target, combined P/L and square-off alerts, pushed live over server-sent events (local notifications on mobile) |
+| **Journal / Research / Settings** | Daily loss-cap meter, NSE news, ban list, deals, insider and results, plus limits and theme |
+
+### Run it
+
+```bash
+pip install -e ".[server]"
+idt serve                 # prints the web URL, an access token and a pairing QR code
+idt serve --demo          # no Dhan account needed: fixtures, clock pinned to 29 Oct 2026 09:45 IST
+```
+
+- **Web**: open the printed `http://<your-ip>:8742/?token=…` link. The production build ships inside the
+  Python package. To develop, run `cd apps/web && npm install && npm run dev`, which proxies `/api` to `:8742`.
+- **iOS** (iOS 17+): `cd apps/ios && xcodegen generate && open IndianDayTrader.xcodeproj`. Scan the QR in
+  **More › Settings**, or point the Camera app at it: the `idt://pair` link opens the app and pairs it.
+- **Android** (8.0+): `cd apps/android && ./gradlew installDebug`. Point the phone camera at the QR, and the
+  `idt://pair` deep link pairs the app. The emulator reaches your Mac at `http://10.0.2.2:8742`.
+
+> [!IMPORTANT]
+> The server binds to your LAN with token auth over plain HTTP, which is meant for a home network or VPN
+> (for example Tailscale). Put it behind HTTPS before exposing it to the internet. Rotate the token by
+> deleting `idt/server.json`.
+
+<details>
+<summary><b>API endpoints</b></summary>
+
+All endpoints are under `/api` with `Authorization: Bearer <token>`, except `/api/health`.
+
+```
+GET  status · config · indices · index/{symbol} · expiries/{u} · chain/{u} · strategies · scan/{setup}
+GET  plan · orders · ticket · journal · alerts · events (SSE) · news · ban · results/{s} · insider/{deals|pit} · charges
+POST strategy · entry/{symbol} · plan · timemachine · size · risk · ticket/confirm {hash, typed:"yes"}
+POST journal/close · alerts · alerts/check      PATCH config (whitelisted keys)      DELETE alerts
+```
+
+Interactive docs: `http://<server>:8742/docs`.
+</details>
 
 ---
 
@@ -415,8 +485,13 @@ src/idt/
 ├── ticket.py      broker-neutral ticket
 ├── timemachine.py Monte Carlo + replay
 ├── charts.py      matplotlib PNG + plotly HTML
+├── service.py     command logic shared by the CLI and the API
+├── server/        FastAPI app (`idt serve`) + bundled web build
 └── cli.py         `idt` command
 skills/idt-*/SKILL.md
+apps/web           React + Vite + TypeScript
+apps/ios           SwiftUI (XcodeGen project.yml)
+apps/android       Kotlin + Jetpack Compose
 ```
 
 The data layer is **pluggable**. To support another broker (Zerodha Kite, Upstox, Angel One),
@@ -428,7 +503,7 @@ implement the `MarketData` protocol in one file.
 
 ```bash
 uv pip install -e ".[dev]"
-pytest -q                                   # 44 tests, offline, under a second
+pytest -q                                   # 51 tests, offline, about a second
 python tests/fixtures/make_fixtures.py      # regenerate deterministic fixtures
 ```
 
@@ -442,9 +517,9 @@ example end to end.
 ## 🗺️ Roadmap
 
 - [x] 14 skills, Dhan adapter, offline fixtures, CI
-- [ ] Self-hosted API server (FastAPI) for the apps
-- [ ] Web app (React + Vite)
-- [ ] Native iOS (SwiftUI) and Android (Jetpack Compose) apps
+- [x] Self-hosted API server (FastAPI) with QR pairing and live alerts
+- [x] Web app (React + Vite), native iOS (SwiftUI) and Android (Jetpack Compose) apps
+- [ ] Push notifications (APNs / FCM) when the app is closed
 - [ ] More data adapters: Zerodha Kite, Upstox, Angel One
 - [ ] Websocket live ticks for alerts
 
