@@ -1,0 +1,21 @@
+name: Feature request
+description: A new setup, broker adapter, risk rule or skill
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What trading workflow does this help with?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behaviour
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety
+      options:
+        - label: This does not add automatic order placement
+          required: true

@@ -1,0 +1,29 @@
+name: Bug report
+description: Something computes wrong, crashes, or a command misbehaves
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "**Never paste your DHAN_ACCESS_TOKEN or client ID.** Redact account details from output."
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      placeholder: idt --now "2026-10-29 09:45" chain NIFTY
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected vs what happened
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: JSON output (redacted)
+      render: json
+  - type: input
+    id: env
+    attributes:
+      label: Python version / OS / data provider (dhan or fixture)
