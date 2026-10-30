@@ -5,3 +5,14 @@ __pycache__/
 .ruff_cache/
 # user workspace: config, plans, orders, journal, cache, charts
 /idt/
+node_modules/
+apps/web/dist/
+# iOS / Android build output
+apps/ios/build/
+apps/ios/*.xcodeproj/xcuserdata/
+apps/ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+apps/android/.gradle/
+apps/android/build/
+apps/android/app/build/
+apps/android/local.properties
+.DS_Store
