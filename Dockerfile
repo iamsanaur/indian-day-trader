@@ -7,9 +7,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MPLCONFIGDIR=/tmp/matplotlib
 
 WORKDIR /app
+
+# Dependencies first (own cached layer): code changes don't reinstall pandas/matplotlib.
 COPY pyproject.toml README.md ./
+RUN mkdir -p src/idt && touch src/idt/__init__.py \
+ && pip install --no-cache-dir ".[server]" \
+ && pip uninstall -y indian-day-trader
+
 COPY src ./src
-RUN pip install --no-cache-dir ".[server]" \
+# The first install left build/ with the stub __init__.py; setuptools would reuse it. Clear it.
+RUN rm -rf build src/*.egg-info \
+ && pip install --no-cache-dir --no-deps . \
  && useradd --system --uid 10001 idt \
  && mkdir -p /data && chown idt /data
 
