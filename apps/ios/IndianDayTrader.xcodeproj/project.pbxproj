@@ -1,0 +1,498 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1112BA21C1F135816B6368B6 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1B56435059615035CBDF17 /* MoreView.swift */; };
+		3C1C12D498433CAC0EF4FE08 /* MarketsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323589837AC26CE2B9691915 /* MarketsView.swift */; };
+		4A83B9A3FC6868B63D1AFD98 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAE9589FAFE765D3681F06C8 /* Assets.xcassets */; };
+		718F35FD0E56DA7EAB2A517D /* AlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180458E431C69836B0C86C13 /* AlertsView.swift */; };
+		896172E000B5BC83523ACD13 /* OptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B48AB5A06B5E3FFC7492258 /* OptionsView.swift */; };
+		95454787673B490B38CC724E /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9712FF19609B1ED3C2A1E2D /* Format.swift */; };
+		96555FB136BC07EE935303E0 /* IndianDayTraderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B15672EBBDA6236B38F0F3EC /* IndianDayTraderTests.swift */; };
+		9EFE19BB81C5411043E94B2D /* StrategyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FB0394C763F2F1E509FF8B /* StrategyView.swift */; };
+		AE4F6290E2B154C46B91740C /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 076CAD72EAC59856BB911B22 /* Components.swift */; };
+		C1EE55F4B21099834E821BC9 /* IndianDayTraderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C890054187FE0D1317058C4C /* IndianDayTraderApp.swift */; };
+		C495171EBB14D2950B9AA237 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB8FE4F71AB95AEDF40BA9D /* Models.swift */; };
+		D822DF8244EB4659CF9F4BC8 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 812FD47C803629EDD83820F0 /* Theme.swift */; };
+		F1C6AFF5FF09A92B503F3454 /* TradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9D73ED3E94860910744C82 /* TradeView.swift */; };
+		FDD0E502E01CF51704946092 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46804154CC94BCA66A25077A /* API.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		11C55CA6584A43CDBF38B4A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5520F0BFD16415E7A123E95E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1DED819DEF360382AA50FAEC;
+			remoteInfo = IndianDayTrader;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		076CAD72EAC59856BB911B22 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		180458E431C69836B0C86C13 /* AlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertsView.swift; sourceTree = "<group>"; };
+		196DFC2E6C9F57A312A50E45 /* IndianDayTrader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = IndianDayTrader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B48AB5A06B5E3FFC7492258 /* OptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionsView.swift; sourceTree = "<group>"; };
+		323589837AC26CE2B9691915 /* MarketsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketsView.swift; sourceTree = "<group>"; };
+		3B9D73ED3E94860910744C82 /* TradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeView.swift; sourceTree = "<group>"; };
+		3D1B56435059615035CBDF17 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		46804154CC94BCA66A25077A /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+		5CB8FE4F71AB95AEDF40BA9D /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		72B1067D9F894B1F18201C30 /* IndianDayTraderTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = IndianDayTraderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		812FD47C803629EDD83820F0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		87CA351245952CBDEE6B0D4A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		AAE9589FAFE765D3681F06C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B15672EBBDA6236B38F0F3EC /* IndianDayTraderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndianDayTraderTests.swift; sourceTree = "<group>"; };
+		C890054187FE0D1317058C4C /* IndianDayTraderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndianDayTraderApp.swift; sourceTree = "<group>"; };
+		C9FB0394C763F2F1E509FF8B /* StrategyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrategyView.swift; sourceTree = "<group>"; };
+		F9712FF19609B1ED3C2A1E2D /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		48AECDDFDFCDAAF74EFAA50B /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				46804154CC94BCA66A25077A /* API.swift */,
+				F9712FF19609B1ED3C2A1E2D /* Format.swift */,
+				5CB8FE4F71AB95AEDF40BA9D /* Models.swift */,
+				812FD47C803629EDD83820F0 /* Theme.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		68B92620CB502FC8163CC83A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				196DFC2E6C9F57A312A50E45 /* IndianDayTrader.app */,
+				72B1067D9F894B1F18201C30 /* IndianDayTraderTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A2F76A5E2CE5866C1CF3AEE8 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AAE9589FAFE765D3681F06C8 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D344B3E6C693DA3231F0F8F6 /* IndianDayTrader */ = {
+			isa = PBXGroup;
+			children = (
+				C890054187FE0D1317058C4C /* IndianDayTraderApp.swift */,
+				87CA351245952CBDEE6B0D4A /* Info.plist */,
+				48AECDDFDFCDAAF74EFAA50B /* Core */,
+				A2F76A5E2CE5866C1CF3AEE8 /* Resources */,
+				D90D430F0B0E29E55A28865F /* Views */,
+			);
+			path = IndianDayTrader;
+			sourceTree = "<group>";
+		};
+		D3F93EF69B7E8016FAA5BBD3 /* IndianDayTraderTests */ = {
+			isa = PBXGroup;
+			children = (
+				B15672EBBDA6236B38F0F3EC /* IndianDayTraderTests.swift */,
+			);
+			path = IndianDayTraderTests;
+			sourceTree = "<group>";
+		};
+		D90D430F0B0E29E55A28865F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				180458E431C69836B0C86C13 /* AlertsView.swift */,
+				076CAD72EAC59856BB911B22 /* Components.swift */,
+				323589837AC26CE2B9691915 /* MarketsView.swift */,
+				3D1B56435059615035CBDF17 /* MoreView.swift */,
+				1B48AB5A06B5E3FFC7492258 /* OptionsView.swift */,
+				C9FB0394C763F2F1E509FF8B /* StrategyView.swift */,
+				3B9D73ED3E94860910744C82 /* TradeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		E1DDFEC4C04E513E3A0DEEE9 = {
+			isa = PBXGroup;
+			children = (
+				D344B3E6C693DA3231F0F8F6 /* IndianDayTrader */,
+				D3F93EF69B7E8016FAA5BBD3 /* IndianDayTraderTests */,
+				68B92620CB502FC8163CC83A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1DED819DEF360382AA50FAEC /* IndianDayTrader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 787AB9D1AFE47B5C8F179190 /* Build configuration list for PBXNativeTarget "IndianDayTrader" */;
+			buildPhases = (
+				FB75414C101B85125EF9F8BB /* Sources */,
+				B6A2656A248B1E0DD355E85A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IndianDayTrader;
+			packageProductDependencies = (
+			);
+			productName = IndianDayTrader;
+			productReference = 196DFC2E6C9F57A312A50E45 /* IndianDayTrader.app */;
+			productType = "com.apple.product-type.application";
+		};
+		426E660E465FF21E46A937C5 /* IndianDayTraderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1ECCCFEE26B7A571BA321E85 /* Build configuration list for PBXNativeTarget "IndianDayTraderTests" */;
+			buildPhases = (
+				1613376B1C73CE4F1773AC56 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0595AAACD9594CCD7B150DC7 /* PBXTargetDependency */,
+			);
+			name = IndianDayTraderTests;
+			packageProductDependencies = (
+			);
+			productName = IndianDayTraderTests;
+			productReference = 72B1067D9F894B1F18201C30 /* IndianDayTraderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5520F0BFD16415E7A123E95E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1DED819DEF360382AA50FAEC = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					426E660E465FF21E46A937C5 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C04B3C3AE51D0D0E252819C8 /* Build configuration list for PBXProject "IndianDayTrader" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E1DDFEC4C04E513E3A0DEEE9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 68B92620CB502FC8163CC83A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1DED819DEF360382AA50FAEC /* IndianDayTrader */,
+				426E660E465FF21E46A937C5 /* IndianDayTraderTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B6A2656A248B1E0DD355E85A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A83B9A3FC6868B63D1AFD98 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1613376B1C73CE4F1773AC56 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96555FB136BC07EE935303E0 /* IndianDayTraderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB75414C101B85125EF9F8BB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FDD0E502E01CF51704946092 /* API.swift in Sources */,
+				718F35FD0E56DA7EAB2A517D /* AlertsView.swift in Sources */,
+				AE4F6290E2B154C46B91740C /* Components.swift in Sources */,
+				95454787673B490B38CC724E /* Format.swift in Sources */,
+				C1EE55F4B21099834E821BC9 /* IndianDayTraderApp.swift in Sources */,
+				3C1C12D498433CAC0EF4FE08 /* MarketsView.swift in Sources */,
+				C495171EBB14D2950B9AA237 /* Models.swift in Sources */,
+				1112BA21C1F135816B6368B6 /* MoreView.swift in Sources */,
+				896172E000B5BC83523ACD13 /* OptionsView.swift in Sources */,
+				9EFE19BB81C5411043E94B2D /* StrategyView.swift in Sources */,
+				D822DF8244EB4659CF9F4BC8 /* Theme.swift in Sources */,
+				F1C6AFF5FF09A92B503F3454 /* TradeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0595AAACD9594CCD7B150DC7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1DED819DEF360382AA50FAEC /* IndianDayTrader */;
+			targetProxy = 11C55CA6584A43CDBF38B4A1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		011027382DEEB67458D0937F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IndianDayTrader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Day Trader";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan the pairing QR code printed by idt serve.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your self-hosted Indian Day Trader server on this network.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.iamsanaur.indiandaytrader;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		2D6D29070C36914DFF082933 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.iamsanaur.indiandaytrader.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IndianDayTrader.app/IndianDayTrader";
+			};
+			name = Debug;
+		};
+		38D124CE3EF4AA45D401D5B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IndianDayTrader/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Day Trader";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan the pairing QR code printed by idt serve.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Connect to your self-hosted Indian Day Trader server on this network.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.iamsanaur.indiandaytrader;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		589C3116A89323F85BBE9A28 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.iamsanaur.indiandaytrader.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IndianDayTrader.app/IndianDayTrader";
+			};
+			name = Release;
+		};
+		907B3448C16794C7B1033226 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E46E9A10E9EB0D3E52876C07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1ECCCFEE26B7A571BA321E85 /* Build configuration list for PBXNativeTarget "IndianDayTraderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2D6D29070C36914DFF082933 /* Debug */,
+				589C3116A89323F85BBE9A28 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		787AB9D1AFE47B5C8F179190 /* Build configuration list for PBXNativeTarget "IndianDayTrader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				38D124CE3EF4AA45D401D5B7 /* Debug */,
+				011027382DEEB67458D0937F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C04B3C3AE51D0D0E252819C8 /* Build configuration list for PBXProject "IndianDayTrader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				907B3448C16794C7B1033226 /* Debug */,
+				E46E9A10E9EB0D3E52876C07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5520F0BFD16415E7A123E95E /* Project object */;
+}
