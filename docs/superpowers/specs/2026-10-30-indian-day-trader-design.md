@@ -137,7 +137,7 @@ degrade independently of trading tools.
 pytest, offline, via `FixtureData` adapter and recorded JSON. Units: indicators, BS/IV/Greeks vs
 known values, max pain/PCR, payoff/breakevens, charges, sizing in lots, risk rules, entry state
 machine, timemachine determinism (seeded), Dhan adapter request/response mapping (mocked HTTP),
-CLI smoke tests. Worked example: NIFTY ORB → bull call spread sized against ₹1,000 max loss.
+CLI smoke tests. Worked example: NIFTY ORB → bull call spread (1 lot of 65) sized against a ₹3,000 max loss.
 
 ## Out of scope
 

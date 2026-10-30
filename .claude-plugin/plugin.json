@@ -1,0 +1,8 @@
+{
+  "name": "indian-day-trader",
+  "version": "0.1.0",
+  "description": "14 Claude skills for intraday trading on NSE/BSE: index charts, option chain analytics, F&O strategies incl. option selling, sizing in lots with Indian charges, a PASS/BLOCK risk gate and broker-neutral tickets. Nothing places orders.",
+  "author": { "name": "Sanaur Rahman" },
+  "license": "MIT",
+  "keywords": ["trading", "nse", "bse", "nifty", "banknifty", "options", "fno", "india"]
+}
