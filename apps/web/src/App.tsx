@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { api } from "./lib/api";
+import { api, ApiError } from "./lib/api";
 import type { Alert, Status } from "./lib/types";
 import { time } from "./lib/format";
 import { Badge, Icons } from "./ui";
@@ -70,6 +70,18 @@ export function App() {
         </div>
       </aside>
       <main className="main">
+        {status.error instanceof ApiError && status.error.status === 401 && (
+          <div className="banner warn" style={{ marginBottom: 18 }}>
+            <div>
+              <div className="banner-title" style={{ fontSize: 15 }}>Pair this browser with your server</div>
+              <div className="small text-2">
+                Open the link printed by <code>idt serve</code> (<code>docker compose logs api | grep "Web app"</code>), which ends in <code>?token=…</code>,
+                or paste that server token under <NavLink to="/settings" style={{ color: "var(--accent)", fontWeight: 600 }}>Settings › Server</NavLink>.
+                This is your server's token — your Dhan login (client ID, PIN, daily TOTP) comes next.
+              </div>
+            </div>
+          </div>
+        )}
         {s?.dhan && <DhanBanner status={s.dhan} />}
         <Routes>
           <Route path="/" element={<Markets />} />

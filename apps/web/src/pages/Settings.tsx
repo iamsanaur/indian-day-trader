@@ -50,7 +50,7 @@ export function Settings() {
         <Card title="Server" right={health.data ? <Badge tone="up">connected · v{health.data.version}{health.data.demo ? " · demo" : ""}</Badge> : <Badge tone="down">not connected</Badge>}>
           <div className="stack">
             <div className="field"><label>Server URL (blank = this site)</label><input className="input" value={conn.url} onChange={(e) => setConn({ ...conn, url: e.target.value })} placeholder="http://192.168.1.10:8742" /></div>
-            <div className="field"><label>Access token (printed by <code>idt serve</code>)</label><input className="input" type="password" value={conn.token} onChange={(e) => setConn({ ...conn, token: e.target.value })} /></div>
+            <div className="field"><label>Server token — from the link printed by <code>idt serve</code> (not your Dhan token)</label><input className="input" type="password" value={conn.token} onChange={(e) => setConn({ ...conn, token: e.target.value })} /></div>
             <button className="btn btn-primary" onClick={() => { saveConnection(conn); qc.invalidateQueries(); }}>Save & connect</button>
             <ErrorBox error={cfg.error} />
           </div>

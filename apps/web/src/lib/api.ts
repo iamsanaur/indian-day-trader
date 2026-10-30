@@ -71,7 +71,7 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown 
   if (!res.ok) {
     const b = body as { error?: string; detail?: string } | null;
     const msg = b?.error ?? b?.detail ?? `HTTP ${res.status}`;
-    throw new ApiError(res.status === 401 ? "Not paired: open Settings and enter the server token." : msg, res.status);
+    throw new ApiError(res.status === 401 ? "This browser is not paired with your server. Open the link printed by `idt serve` (it ends in ?token=…) or paste that server token in Settings. It is not your Dhan token." : msg, res.status);
   }
   return body as T;
 }
