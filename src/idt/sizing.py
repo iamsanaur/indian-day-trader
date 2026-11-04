@@ -65,9 +65,9 @@ def reprice(plan: dict, ltp: float | None) -> dict:
     else:
         return out
     worse = max(sign * ltp, sign * entry) * sign
-    out["entry_now"] = round(worse, 2)
     if worse == entry:
         return out
+    out["entry_now"] = round(worse, 2)
     base = abs(entry - stop)
     out["risk_per_unit"] = round(risk * abs(worse - stop) / base, 2)
     out["reward_per_unit"] = round(reward * sign * (target - worse) / abs(target - entry), 2) if target != entry else 0.0

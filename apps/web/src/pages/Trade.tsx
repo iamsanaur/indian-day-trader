@@ -194,14 +194,24 @@ function OddsStep({ next }: { next: () => void }) {
         <ErrorBox error={run.error} />
         {r && (
           <div className="stack">
+            {r.verdict && (
+              <div className={`banner ${/toward the target/.test(r.verdict) ? "pass" : /toward the stop/.test(r.verdict) ? "block" : "warn"}`}>
+                <div>
+                  <div className="banner-title">{r.verdict.split(":")[0]}</div>
+                  <div className="small text-2">{r.verdict.slice(r.verdict.indexOf(":") + 1).trim()}</div>
+                  {(r.verdict_notes ?? []).map((n) => <div key={n} className="small text-2">{n}</div>)}
+                </div>
+              </div>
+            )}
             <ProbBar mc={r.monte_carlo} />
             <div className="stats">
               <Stat k="Mean P/L / unit" v={signedRupees(r.monte_carlo.pnl_per_unit.mean)} tone={r.monte_carlo.pnl_per_unit.mean >= 0 ? "up" : "down"} />
               <Stat k="Median" v={signedRupees(r.monte_carlo.pnl_per_unit.median)} />
               <Stat k="5th – 95th pct" v={`${signedRupees(r.monte_carlo.pnl_per_unit.p5)} … ${signedRupees(r.monte_carlo.pnl_per_unit.p95)}`} />
               <Stat k="Expected R" v={num(r.monte_carlo.expected_r, 2)} />
+              {r.monte_carlo.p_green != null && <Stat k="Green" v={`${(r.monte_carlo.p_green * 100).toFixed(1)}%`} hint="target first, or in profit at square-off" />}
             </div>
-            {r.replay.fired != null && (
+            {r.replay_line ? <p className="small text-2" style={{ margin: 0 }}>{r.replay_line}</p> : r.replay.fired != null && (
               <p className="small text-2" style={{ margin: 0 }}>Replay: the rule fired on {r.replay.fired} of {r.replay.sessions} prior sessions · win rate {r.replay.win_rate != null ? `${(r.replay.win_rate * 100).toFixed(0)}%` : "—"} · average {num(r.replay.avg_r, 2)} R</p>
             )}
             <p className="small muted" style={{ margin: 0 }}>{r.caveat} Sampled {r.monte_carlo.sessions_sampled} sessions, {time(r.monte_carlo.from)}–{time(r.monte_carlo.to)} IST.</p>
@@ -237,6 +247,7 @@ function SizeStep({ next }: { next: () => void }) {
               <Stat k="Loss at stop" v={rupees(o.loss_at_stop)} tone="down" hint={`incl. ₹${num(o.charges.if_stopped, 0)} charges`} />
               <Stat k="Profit at target" v={rupees(o.profit_at_target)} tone="up" hint={`net of ₹${num(o.charges.if_target, 0)} charges`} />
               <Stat k="Margin" v={rupees(o.margin.total)} hint={o.margin.source} />
+              {o.rr != null && <Stat k="Reward : risk" v={num(o.rr, 2)} hint={o.entry_now != null ? `re-measured from ${num(o.entry_now, 2)}` : undefined} />}
             </div>
             <table className="table">
               <thead><tr><th>Leg</th><th>Side</th><th>Qty</th><th>Price</th></tr></thead>
