@@ -71,7 +71,8 @@ def cmd_scan(args, cfg):
 def cmd_entry(args, cfg):
     data = get_data(cfg)
     while True:
-        res = svc.entry_check(data, cfg, args.symbol, get_now(args), args.setup, args.above, args.below, args.write)
+        res = svc.entry_check(data, cfg, args.symbol, get_now(args), args.setup, args.above, args.below, args.write,
+                              args.min_volume_x)
         if args.action == "check" or res["state"] != "waiting" or getattr(args, "now", None):
             emit(res)
             return
@@ -85,7 +86,7 @@ def cmd_exit(args, cfg):
 
 
 def cmd_timemachine(args, cfg):
-    emit(svc.timemachine(get_data(cfg), cfg, get_now(args), args.paths, args.seed, args.days, args.write))
+    emit(svc.timemachine(get_data(cfg), cfg, get_now(args), args.paths, args.seed, args.days, args.write, args.window))
 
 
 def cmd_size(args, cfg):
@@ -209,7 +210,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(fn=cmd_strategy)
 
     p = sub.add_parser("scan", help="chart scanner")
-    p.add_argument("setup", choices=["orb", "flag", "bounce"])
+    p.add_argument("setup", choices=list(svc.SCAN_SETUPS),
+                   help="orb (intraday) | breakout | flag | reclaim | oversold | bounce | daily (all daily setups)")
     p.add_argument("--universe", default="watchlist", help="fno | watchlist | indices | comma list")
     p.add_argument("--limit", type=int, default=20)
     p.add_argument("--max-symbols", type=int, default=250)
@@ -223,6 +225,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--above", type=float)
     p.add_argument("--below", type=float)
     p.add_argument("--poll", type=int, default=60)
+    p.add_argument("--min-volume-x", type=float, help="trigger bar volume >= N x the opening-range average")
     p.add_argument("--write", action="store_true")
     p.set_defaults(fn=cmd_entry)
 
@@ -245,6 +248,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--paths", type=int, default=10000)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--days", type=int, default=59, help="prior sessions to sample")
+    p.add_argument("--window", type=int, default=2, help="draw each bar from the same time of day +/- N bars")
     p.add_argument("--write", action="store_true")
     p.set_defaults(fn=cmd_timemachine)
 

@@ -19,6 +19,11 @@ DEFAULTS: dict[str, Any] = {
     "leverage_cap": 5,               # max notional / capital for intraday equity
     "or_minutes": 15,
     "entry_expiry": "11:30",         # ORB setups expire if not triggered by this time
+    "no_entries_before": "09:30",    # no fresh entries while the 15-minute opening range forms
+    "min_reward_risk": 1.0,          # risk check blocks a trade whose reward:risk (at the current price) is lower
+    "min_volume_x": None,            # optional: trigger bar volume >= N x opening-range average (stocks/futures)
+    "scan_min_price": 50.0,          # scanner liquidity floor for stocks (Rs)
+    "scan_min_turnover_cr": 25.0,    # scanner: average daily traded value over 20 sessions, Rs crore
     "entry_cutoff": "15:00",         # no fresh intraday entries after this
     "squareoff": "15:15",            # flat by this time (MIS)
     "allow_short": False,

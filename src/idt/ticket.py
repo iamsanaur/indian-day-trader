@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from .plan import to_tick
+
 TICKET_MAX_AGE = 600  # seconds between risk PASS and ticket
 
 
@@ -14,7 +16,8 @@ class TicketError(RuntimeError):
     pass
 
 
-def build(plan: dict, orders: dict, risk: dict | None, now: datetime, tick: float = 0.05) -> dict:
+def build(plan: dict, orders: dict, risk: dict | None, now: datetime, tick: float | None = None) -> dict:
+    tick = tick or plan.get("tick") or 0.05
     if not risk or risk.get("verdict") != "PASS":
         raise TicketError("No risk PASS on file. Run `idt risk check` first.")
     if risk.get("order_hash") != orders.get("hash"):
@@ -25,7 +28,9 @@ def build(plan: dict, orders: dict, risk: dict | None, now: datetime, tick: floa
 
     entries = [{"action": l["side"], "symbol": l["symbol"], "exchange": orders.get("exchange", "NSE"),
                 "segment": "EQ" if orders["kind"] == "equity" else "FNO", "product": l["product"],
-                "order_type": "LIMIT", "price": l["price"], "quantity": l["quantity"], "lots": l.get("lots"),
+                "order_type": "LIMIT", "quantity": l["quantity"], "lots": l.get("lots"),
+                # off-tick prices are rejected: a buy limit rounds up, a sell limit down (never less marketable)
+                "price": to_tick(l["price"], tick, "up" if l["side"] == "BUY" else "down"),
                 "validity": "DAY", "security_id": l.get("security_id", "")} for l in orders["legs"]]
 
     exits: list[dict] = []
@@ -35,10 +40,10 @@ def build(plan: dict, orders: dict, risk: dict | None, now: datetime, tick: floa
         buffer = max(tick * 10, round(plan["stop"] * 0.002 / tick) * tick)
         sl_limit = plan["stop"] - buffer if close_side == "SELL" else plan["stop"] + buffer
         exits = [
-            {"action": close_side, "symbol": leg["symbol"], "order_type": "SL", "trigger_price": plan["stop"],
+            {"action": close_side, "symbol": leg["symbol"], "order_type": "SL", "trigger_price": to_tick(plan["stop"], tick),
              "price": round(round(max(sl_limit, tick) / tick) * tick, 2), "quantity": leg["quantity"],
              "product": leg["product"], "note": "stop-loss (SL-limit; SL-M is not allowed for options on NSE)"},
-            {"action": close_side, "symbol": leg["symbol"], "order_type": "LIMIT", "price": plan["target"],
+            {"action": close_side, "symbol": leg["symbol"], "order_type": "LIMIT", "price": to_tick(plan["target"], tick),
              "quantity": leg["quantity"], "product": leg["product"], "note": "target"},
         ]
         oco = "Stop and target are one-cancels-other: when one fills, cancel the other (or use your broker's GTT/OCO/bracket)."

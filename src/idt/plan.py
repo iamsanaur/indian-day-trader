@@ -6,6 +6,7 @@ Every plan reduces to `risk_per_unit` / `reward_per_unit` in rupees so sizing is
 
 from __future__ import annotations
 
+import math
 from datetime import date, datetime
 
 from . import fno
@@ -13,8 +14,37 @@ from .market import now_ist, years_to_expiry
 from .strategy import Leg, analyze, legs_from_dicts, pnl_now
 
 
+MIN_RISK_PCT = 0.05   # a stop closer than 0.05% of the price is inside normal noise and the spread
+TICK = 0.05           # NSE/BSE F&O and most cash tick; equity plans pass the instrument's own tick
+
+
 def _num(rule: str) -> float:
     return float(rule.split(":", 1)[1])
+
+
+def to_tick(x: float, tick: float = TICK, mode: str = "nearest") -> float:
+    """Round a price to the exchange tick. mode: nearest | down | up (orders off the tick are rejected)."""
+    n = x / tick
+    n = math.floor(n + 1e-9) if mode == "down" else math.ceil(n - 1e-9) if mode == "up" else math.floor(n + 0.5)
+    return round(n * tick, 2)
+
+
+def stop_to_tick(stop: float, side: str, tick: float = TICK) -> float:
+    """A stop rounds AWAY from the entry: down for a long, up for a short (never tighter than the rule)."""
+    return to_tick(stop, tick, "down" if side == "long" else "up")
+
+
+def check_levels(side: str, entry: float, stop: float, target: float, what: str = "price") -> None:
+    sign = 1 if side == "long" else -1
+    if sign * (entry - stop) <= 0:
+        raise ValueError(f"stop {stop:g} is on the wrong side of the entry {entry:g} for a {side}: "
+                         "a long's stop must be below the entry, a short's above")
+    if sign * (target - entry) <= 0:
+        raise ValueError(f"target {target:g} is not beyond the entry {entry:g}: the move already happened. "
+                         "Pick a farther target or skip the trade")
+    if what == "price" and abs(entry - stop) < entry * MIN_RISK_PCT / 100:
+        raise ValueError(f"stop {stop:g} is {abs(entry - stop):.2f} from the entry, under {MIN_RISK_PCT}% of the "
+                         "price: normal noise and the spread would stop you out. Use a wider stop")
 
 
 def underlying_stop(rule: str, side: str, entry: float, rng: dict | None = None, atr: float | None = None) -> float:
@@ -64,15 +94,21 @@ def _finish(plan: dict) -> dict:
 
 
 def linear_plan(setup: dict, kind: str, stop_rule: str, target_rule: str, squareoff: str,
-                contract: str, lot_size: int = 1, basis_offset: float = 0.0) -> dict:
-    """Equity or futures. basis_offset shifts index levels to the future's price (future - spot)."""
+                contract: str, lot_size: int = 1, basis_offset: float = 0.0, tick: float = TICK) -> dict:
+    """Equity or futures. basis_offset shifts index levels to the future's price (future - spot).
+
+    The stop rounds to the tick away from the entry; the target is entry + R x risk on the rounded stop,
+    rounded to the nearest tick.
+    """
     side, entry = setup["side"], setup["entry"]
-    stop = underlying_stop(stop_rule, side, entry, setup.get("range"), setup.get("atr"))
-    target = target_from(target_rule, side, entry, stop)
+    stop = stop_to_tick(underlying_stop(stop_rule, side, entry, setup.get("range"), setup.get("atr")), side, tick)
+    target = to_tick(target_from(target_rule, side, entry, stop), tick)
+    check_levels(side, entry, stop, target)
     plan = _base(setup, kind, stop_rule, target_rule, squareoff)
     plan.update(basis="underlying", contract=contract, unit="share" if kind == "equity" else "lot",
                 lot_size=lot_size, underlying_stop=stop, underlying_target=target,
-                entry=round(entry + basis_offset, 2), stop=round(stop + basis_offset, 2), target=round(target + basis_offset, 2))
+                entry=to_tick(entry + basis_offset, tick), stop=stop_to_tick(stop + basis_offset, side, tick),
+                target=to_tick(target + basis_offset, tick), tick=tick)
     plan["risk_per_unit"] = round(abs(entry - stop) * lot_size, 2)
     plan["reward_per_unit"] = round(abs(target - entry) * lot_size, 2)
     return _finish(plan)
@@ -86,20 +122,25 @@ def option_plan(setup: dict, leg: Leg, lot_size: int, stop_rule: str, target_rul
     plan.update(contract=leg.symbol, unit="lot", lot_size=lot_size, legs=[leg.to_dict()], expiry=leg.expiry,
                 entry=leg.premium)
     if stop_rule.startswith("premium-pct:"):
-        stop = round(leg.premium * (1 - _num(stop_rule) / 100), 2)
-        target = target_from(target_rule, "long", leg.premium, stop)
+        stop = to_tick(leg.premium * (1 - _num(stop_rule) / 100), TICK, "down")
+        target = to_tick(target_from(target_rule, "long", leg.premium, stop))
+        check_levels("long", leg.premium, stop, target, "premium")
         plan.update(basis="premium", stop=stop, target=target)
     else:
         side, entry = setup["side"], setup["entry"]
-        u_stop = underlying_stop(stop_rule, side, entry, setup.get("range"), setup.get("atr"))
-        u_target = target_from(target_rule, side, entry, u_stop)
+        u_stop = stop_to_tick(underlying_stop(stop_rule, side, entry, setup.get("range"), setup.get("atr")), side)
+        u_target = to_tick(target_from(target_rule, side, entry, u_stop))
+        check_levels(side, entry, u_stop, u_target)
         t = years_to_expiry(date.fromisoformat(leg.expiry), moment)
         iv = max(leg.iv, 0.01)
         # Anchor the model to the traded premium so the stop/target are offsets from the real fill.
         model_entry = fno.bs_price(entry, leg.strike, t, r, iv, leg.kind)
-        reprice = lambda s: round(max(0.05, leg.premium + fno.bs_price(s, leg.strike, t, r, iv, leg.kind) - model_entry), 2)
+        reprice = lambda s: max(TICK, leg.premium + fno.bs_price(s, leg.strike, t, r, iv, leg.kind) - model_entry)
         plan.update(basis="underlying", underlying_stop=u_stop, underlying_target=u_target,
-                    stop=reprice(u_stop), target=reprice(u_target))
+                    stop=to_tick(reprice(u_stop), TICK, "down"), target=to_tick(reprice(u_target)))
+        if plan["target"] <= plan["entry"] or plan["stop"] >= plan["entry"]:
+            raise ValueError("the option barely moves between the stop and the target (deep OTM or near expiry); "
+                             "pick a strike nearer the money or stop on premium (premium-pct:N)")
     plan["risk_per_unit"] = round((plan["entry"] - plan["stop"]) * lot_size, 2)
     plan["reward_per_unit"] = round((plan["target"] - plan["entry"]) * lot_size, 2)
     return _finish(plan)

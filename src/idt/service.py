@@ -288,37 +288,77 @@ def _universe(data, which: str) -> list[str]:
     return [s.strip().upper() for s in which.split(",") if s.strip()]
 
 
+SCAN_SETUPS = ("orb", *scanner.DAILY, "daily")
+
+
 def scan(data, cfg: dict, setup: str, now: datetime, universe: str = "watchlist", limit: int = 20,
          max_symbols: int = 250, verbose: bool = False) -> dict:
-    if setup not in ("orb", "flag", "bounce"):
-        raise ValueError("setup must be orb, flag or bounce")
+    """setup: orb (intraday), one daily setup, or `daily` for every daily setup at once."""
+    if setup not in SCAN_SETUPS:
+        raise ValueError(f"setup must be one of {', '.join(SCAN_SETUPS)}")
     symbols = _universe(data, universe)[:max_symbols]
-    hits, errors = [], {}
+    hits, errors, illiquid = [], {}, {}
+    fetched = 0
+    if setup == "orb" and now < at(now.date(), "09:15") + timedelta(minutes=cfg["or_minutes"] + 5):
+        return {"setup": setup, "as_of": now.isoformat(), "scanned": 0, "hits": [],
+                "message": f"too early: the {cfg['or_minutes']}-minute opening range and the first bar after it "
+                           f"close at {(at(now.date(), '09:15') + timedelta(minutes=cfg['or_minutes'] + 5)):%H:%M}"}
+    rules = list(scanner.DAILY) if setup == "daily" else [setup]
     for sym in symbols:
         try:
             if setup == "orb":
                 df = intraday(data, sym, now.date())
+                fetched += 1
                 hit = scanner.orb(sym, df[df.index < now], now, cfg)
-            else:
-                dly = daily(data, sym, now.date())
-                dly = dly[dly.index.date < now.date()] if now.time() < at(now.date(), "15:30").time() else dly
-                hit = scanner.bull_flag(sym, dly) if setup == "flag" else scanner.oversold_bounce(sym, dly)
-            if hit:
-                hits.append(hit)
+                if hit:
+                    hits.append(hit)
+                continue
+            dly = daily(data, sym, now.date())
+            # Today's daily bar is still forming during the session: use completed sessions only.
+            dly = dly[dly.index.date < now.date()] if now.time() < at(now.date(), "15:30").time() else dly
+            fetched += 1
+            ok, why = scanner.liquid(dly, cfg.get("scan_min_price", 0), cfg.get("scan_min_turnover_cr", 0))
+            if not ok and not index_info(sym):
+                illiquid[sym] = why
+                continue
+            for name in rules:
+                hit = scanner.DAILY[name](sym, dly)
+                if hit:
+                    hits.append(hit)
         except (DataError, ValueError, KeyError) as exc:
             errors[sym] = str(exc)
-    return {"setup": setup, "as_of": now.isoformat(), "scanned": len(symbols), "hits": scanner.rank(hits)[:limit],
-            "errors": errors if verbose else len(errors)}
+    ranked = scanner.rank(hits)
+    out = {"setup": setup, "as_of": now.isoformat(), "universe": universe, "scanned": len(symbols), "fetched": fetched,
+           "failed": len(errors), "illiquid": len(illiquid), "matched": len(ranked), "hits": ranked[:limit],
+           "errors": errors if verbose else len(errors)}
+    if setup != "orb":
+        out["data_through"] = (now.date() if now.time() >= at(now.date(), "15:30").time() else
+                               "the previous session" + (" (today's daily bar is still forming)"
+                                                         if now.time() >= at(now.date(), "09:15").time() else ""))
+        if verbose:
+            out["illiquid_symbols"] = illiquid
+    if errors:
+        out["partial"] = f"fetched {fetched} of {len(symbols)} symbols ({len(errors)} failed): the scan is partial"
+    out["note"] = "A hit matched a rule. It is not a buy, and a setup on a chart is not a prediction."
+    return out
 
 
 def entry_check(data, cfg: dict, symbol: str, now: datetime, setup: str = "orb", above: float | None = None,
-                below: float | None = None, write: bool = False) -> dict:
+                below: float | None = None, write: bool = False, min_volume_x: float | None = None) -> dict:
+    ph = phase(now, cfg["holidays"])
+    if ph == "holiday":
+        return {"symbol": symbol.upper(), "setup": setup, "state": "closed", "as_of": now.isoformat(),
+                "detail": "the market is closed today (weekend or holiday)"}
     df = intraday(data, symbol, now.date())
     prev = ind.prev_day_levels(daily(data, symbol, now.date(), 30), now.date()) if setup == "pdh" else None
     seen = df[df.index < now]
-    res = entry_mod.check(seen, now, setup, or_minutes=cfg["or_minutes"], expire=cfg["entry_expiry"],
-                          above=above, below=below, prev=prev)
+    expire = cfg["entry_expiry"] if setup == "orb" else cfg["entry_cutoff"]
+    res = entry_mod.check(seen, now, setup, or_minutes=cfg["or_minutes"], expire=expire,
+                          above=above, below=below, prev=prev, no_entries_before=cfg.get("no_entries_before"),
+                          min_volume_x=min_volume_x if min_volume_x is not None else cfg.get("min_volume_x"))
     res["symbol"] = symbol.upper()
+    if ph in ("before-open", "pre-open"):
+        res["detail"] = "not open yet: the session starts at 09:15 IST"
     if res["state"] == "triggered" and write:
         a = ind.atr(seen, 14)
         res["atr"] = round(float(a.iloc[-1]), 2) if a.notna().any() else None
@@ -349,11 +389,20 @@ def exit_plan(data, cfg: dict, now: datetime, kind: str | None = None, stop: str
         if not setup:
             raise DataError("No idt/setup.json. Run `idt entry check SYMBOL --write` or pass --symbol/--side/--entry.")
         sym = setup["symbol"]
+        if setup.get("state") not in (None, "triggered"):
+            raise ValueError(f"idt/setup.json for {sym} has not triggered ({setup.get('state')}). "
+                             "Wait for the trigger or pass --entry to plan ahead")
+        if now >= at(now.date(), cfg["squareoff"]):
+            raise ValueError(f"it is past the square-off time {cfg['squareoff']}: no new intraday plan today")
         kind = kind or ("option" if index_info(sym) else "equity")
         stop = stop or ("or-mid" if setup.get("range") else "pct:0.5")
         target = target or "1.5R"
         if kind == "equity":
-            p = plan_mod.linear_plan(setup, "equity", stop, target, cfg["squareoff"], sym)
+            try:
+                tick = float(data.instrument(sym).tick_size or plan_mod.TICK)
+            except (DataError, KeyError, ValueError):
+                tick = plan_mod.TICK
+            p = plan_mod.linear_plan(setup, "equity", stop, target, cfg["squareoff"], sym, tick=tick)
         elif kind == "future":
             fut = data.instrument(f"{sym} FUT")
             q = data.quote([sym, f"{sym} FUT"])
@@ -381,7 +430,7 @@ def get_plan() -> dict:
 
 
 def timemachine(data, cfg: dict, now: datetime, paths: int = 10000, seed: int = 42, days: int = 59,
-                write: bool = False) -> dict:
+                write: bool = False, window: int = 2) -> dict:
     p = _plan_or_die()
     day = datetime.fromisoformat(p["created"]).date()
     df5 = intraday(data, p["symbol"], day, days)
@@ -390,13 +439,18 @@ def timemachine(data, cfg: dict, now: datetime, paths: int = 10000, seed: int = 
     else:
         start = now.replace(second=0, microsecond=0)
         start += timedelta(minutes=(5 - start.minute % 5) % 5)
-    sim = tm.simulate(p, df5, start, paths, seed, cfg["risk_free_rate"])
-    rep = tm.replay(p, df5, day, cfg)
+    sim = tm.simulate(p, df5, start, paths, seed, cfg["risk_free_rate"], window=window, max_sessions=days)
+    rep = tm.replay(p, df5, day, cfg, max_sessions=days)
     orders = load_state("orders.json")
     out = {"plan": {k: p.get(k) for k in ("symbol", "kind", "side", "basis", "entry", "stop", "target", "stop_pnl",
                                           "target_pnl", "risk_per_unit", "reward_per_unit", "rr")},
-           "monte_carlo": sim, "replay": rep,
-           "caveat": "Simulation from prior sessions' 5-minute bars, constant IV for options. Not a prediction."}
+           "monte_carlo": sim, "replay": rep, "verdict": sim["verdict"]["line"], "verdict_notes": sim["verdict"]["notes"],
+           "caveat": (f"Simulation from the prior {sim['sessions_sampled']} full sessions' 5-minute bars (seed {seed}), "
+                      "constant IV for options. Not a prediction: results, RBI policy, budget and expiry days can do "
+                      "what those sessions never did.")}
+    if rep.get("fired"):
+        out["replay_line"] = (f"History: the same rule on {rep['sessions']} real sessions fired {rep['fired']} times: "
+                              f"{rep['target']} target, {rep['stop']} stop, {rep['flat']} neither. Average R {rep['avg_r']:+.3f}.")
     if orders and orders.get("units"):
         out["sized"] = {"units": orders["units"], "expected_pnl": round(sim["pnl_per_unit"]["mean"] * orders["units"], 2)}
     if write:
@@ -406,15 +460,21 @@ def timemachine(data, cfg: dict, now: datetime, paths: int = 10000, seed: int = 
 
 def size(data, cfg: dict, now: datetime, max_loss: float | None = None, write: bool = False) -> dict:
     p = _plan_or_die()
-    quote_ts = None
+    created = str(p.get("created", ""))[:10]
+    if created and created != now.date().isoformat():
+        raise ValueError(f"idt/plan.json is from {created}, not today. Make a new one with `idt exit plan`.")
+    quote_ts, ltp = None, None
+    # Re-measure risk from a fresh price: the underlying for underlying-basis plans, the option for premium stops.
+    watch = p["contract"] if p.get("basis") == "premium" else p["symbol"]
     try:
-        q = data.quote([p["symbol"]]).get(p["symbol"])
-        quote_ts = (q.ts or now).isoformat() if q else None
+        q = data.quote([watch]).get(watch)
+        if q:
+            quote_ts, ltp = (q.ts or now).isoformat(), q.ltp
     except DataError:
         pass
     info = index_info(p["symbol"])
     exchange = "BSE" if info and info.exchange == "BSE" else "NSE"
-    orders = sizing.size(p, cfg, data.margin, _available(cfg, data), quote_ts, exchange, max_loss, now)
+    orders = sizing.size(p, cfg, data.margin, _available(cfg, data), quote_ts, exchange, max_loss, now, ltp=ltp)
     if write:
         save_state("orders.json", orders)
         orders["written"] = "idt/orders.json"

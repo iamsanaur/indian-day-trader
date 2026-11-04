@@ -37,3 +37,17 @@ wants naked and has set `allow_naked: true`. Expiry-day short entries are blocke
 (`block_expiry_day_selling`). Never imply a credit is "free money".
 
 Next: `/idt-exit` with `--kind strategy` to set the combined-P/L stop and target.
+
+## Rules
+
+- Always show max loss (or "unlimited"), breakevens and margin before anything else.
+- Compare at least one defined-risk alternative when the user asks for a naked short.
+- A payoff chart is arithmetic at expiry (and today, at constant IV), not a forecast.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.

@@ -18,3 +18,17 @@ Summarise what matters for intraday: results timing (most companies report after
 board outcomes, large orders, regulatory actions, pledge changes. Flag event risk: avoid fresh
 positions into a scheduled results release unless the user intends to trade the event. If an
 endpoint errors, say so and continue; trading tools do not depend on it.
+
+## Rules
+
+- Times are IST. Say how old each item is and link the attachment.
+- An announcement explains a move after the fact at best. Never infer a direction from a headline.
+- Results and board meetings are event risk: say so when the plan's symbol has one today.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.
