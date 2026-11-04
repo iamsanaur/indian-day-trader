@@ -150,6 +150,9 @@ export interface Orders {
   margin: { total: number; source?: string };
   notes: string[];
   hash: string;
+  rr?: number;
+  entry_now?: number | null;
+  decided_by?: string;
 }
 
 export interface RiskVerdict {
@@ -180,13 +183,20 @@ export interface TimeMachine {
     p_target: number;
     p_stop: number;
     p_flat: number;
+    p_green?: number;
+    r_at_target?: number | null;
+    seed?: number;
     pnl_per_unit: { mean: number; median: number; p5: number; p95: number };
     expected_r: number | null;
     sessions_sampled: number;
     from: string;
     to: string;
   };
-  replay: { fired?: number; win_rate?: number | null; avg_r?: number | null; sessions?: number; skipped?: string };
+  replay: { fired?: number; win_rate?: number | null; avg_r?: number | null; sessions?: number; skipped?: string;
+            target?: number; stop?: number; flat?: number };
+  verdict?: string;
+  verdict_notes?: string[];
+  replay_line?: string;
   sized?: { units: number; expected_pnl: number };
   caveat: string;
 }

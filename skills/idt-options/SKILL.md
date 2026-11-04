@@ -37,3 +37,17 @@ writers defend 25,500". Do not present PCR or max pain as predictions. Note `day
 expiry, gamma risk is high and premiums decay fast.
 
 For trades, hand over to `/idt-strategy` (build/payoff) and the plan -> size -> risk -> ticket chain.
+
+## Rules
+
+- Say the expiry and `days_to_expiry` with every read. Near expiry, gamma risk is high and premiums decay fast.
+- PCR, max pain and OI walls describe positioning. They are not predictions; never present them as one.
+- Never quote a remembered lot size or expiry day: read them from the output.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.

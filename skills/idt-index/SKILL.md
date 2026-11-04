@@ -38,3 +38,17 @@ change the picture. Mention INDIA VIX from the board when discussing option prem
 Dhan: `DHAN_CLIENT_ID` and `DHAN_PIN` in the environment, then `idt dhan login` once a day with the
 user's 6-digit TOTP (ask them for it; never store it). `idt dhan status` shows the time left. If a command
 returns `{"error": ...}`, relay the instructions in it. `idt init` creates `idt/config.json`.
+
+## Rules
+
+- Say the time of the data (`as_of`) and that 5-minute bars are not ticks.
+- Levels describe where price is; they do not predict where it goes. Never say "will".
+- Next steps, if the user wants a trade: `/idt-entry` for the trigger, `/idt-options` for the chain.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.

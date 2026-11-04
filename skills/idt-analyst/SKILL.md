@@ -17,3 +17,17 @@ Figures come from NSE results-comparison data; units are as filed (usually Rs la
 names vary across filings, so values are matched by keyword. Treat them as a summary and point to
 the filing for anything decision-critical. Note the standalone vs consolidated mix. Avoid valuation
 calls; describe the trend (accelerating, slowing, margin direction from profit vs revenue growth).
+
+## Rules
+
+- Say the units as filed and whether each quarter is standalone or consolidated.
+- Describe the trend; avoid valuation calls and price targets.
+- Before trading a stock on a results day, say so and point to `/idt-news` for the timing.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.

@@ -20,3 +20,17 @@ idt insider pit --symbol RELIANCE --days 90   # SEBI (PIT) Regulations disclosur
 Interpretation: promoter market purchases are more informative than ESOP allotments or pledge
 creation/release, so separate them. Disclosures lag the trade. Never present insider activity as a
 trade signal by itself. Public NSE endpoint, unofficial: if it fails, say so.
+
+## Rules
+
+- Say the disclosure date and the trade date: disclosures lag the trade by days.
+- Separate market purchases from ESOP, pledge and inter-se transfers before drawing any read.
+- Never present insider or bulk-deal activity as a trade signal by itself.
+
+## Safety
+
+- Education and tooling, not investment advice. Describe what the data shows; never call it a signal to buy or sell.
+- Paper mode by default (`"mode": "paper"`). Nothing in this pack places an order: trades go through
+  `/idt-exit` -> `/idt-timemachine` -> `/idt-budget` -> `/idt-risk` -> `/idt-broker`, and the user places them.
+- No shorting or naked options unless the config allows it and the user confirms.
+- Dhan credentials live in environment variables. Never store or repeat the user's TOTP.

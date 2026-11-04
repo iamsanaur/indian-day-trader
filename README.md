@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml/badge.svg)](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-58%20passing-1a9c5b)
+![Tests](https://img.shields.io/badge/tests-72%20passing-1a9c5b)
 ![Apps](https://img.shields.io/badge/apps-web%20·%20iOS%20·%20Android-4f46e5)
 ![Data](https://img.shields.io/badge/data-Dhan%20v2%20API-5b4bff)
 [![Release](https://img.shields.io/github/v/release/iamsanaur/indian-day-trader?color=4f46e5)](https://github.com/iamsanaur/indian-day-trader/releases/latest)
@@ -98,8 +98,9 @@ custom legs. Shows payoff, breakevens, max P/L, net Greeks and **basket margin**
 <td valign="top">
 
 ### 🛡️ Risk gate
-**PASS / BLOCK** on: daily loss cap, trade count, entry cutoff, ban list, naked shorts, expiry-day selling,
-margin and stale prices. Every rule must pass before a ticket can be built.
+**PASS / BLOCK** on: entry window, daily loss cap, trade count, duplicates, minimum reward:risk at the
+current price, ban list, naked shorts, expiry-day selling, margin and stale prices. Every rule must pass
+before a ticket can be built.
 
 </td>
 </tr>
@@ -107,8 +108,9 @@ margin and stale prices. Every rule must pass before a ticket can be built.
 <td valign="top">
 
 ### 🎲 Time Machine
-10,000 seeded Monte Carlo sessions built from real 5-minute bar shapes at the same time of day,
-plus a replay of the same rule on prior sessions. Options are repriced with Black-Scholes.
+10,000 seeded Monte Carlo sessions built from real 5-minute bar shapes at the same time of day (±2 bars),
+plus a replay of the same rule on prior sessions, and a one-line verdict against break-even for the
+plan's reward:risk. Options are repriced with Black-Scholes.
 
 </td>
 <td valign="top">
@@ -132,7 +134,7 @@ and GST are included in the loss at stop.
 
 ```mermaid
 flowchart LR
-    A[🔍 Scanner<br/>ORB · flag · bounce] --> B[📰 News<br/>announcements · ban list]
+    A[🔍 Scanner<br/>ORB · breakout · flag · oversold] --> B[📰 News<br/>announcements · ban list]
     B --> C[⏱️ Entry<br/>waiting → triggered]
     C --> D[🎯 Exit plan<br/>stop + target first]
     D --> E[🎲 Time Machine<br/>odds before money]
@@ -278,6 +280,19 @@ docker compose exec api idt dhan login                                   # or us
 The API listens only on `127.0.0.1:8742`. The public path is the tunnel, which serves HTTPS from
 Cloudflare's edge. State (config, journal, token) lives in the `idt-data` volume.
 
+**Updating** to a new release keeps the volume, so your config, journal and server token carry over:
+
+```bash
+git pull
+docker compose up -d --build api       # rebuilds indian-day-trader:<version>, restarts only the API
+docker compose ps                      # wait for "healthy"
+curl -s http://127.0.0.1:8742/api/health   # "version" shows the release you pulled
+docker image prune -f                  # optional: drop the previous image
+```
+
+New config keys arrive with their defaults; your `idt/config.json` only overrides what you set. The Dhan
+session token survives the restart, so no new TOTP is needed until it expires.
+
 ### Install the apps
 
 Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases/latest)
@@ -332,10 +347,10 @@ idt init                                  # then set "max_loss_per_trade": 3000 
 <tr><td>🔗 Chain</td><td><code>idt chain NIFTY</code></td><td>Max pain 26,000 · call wall 26,500 · put wall 25,500 · ATM IV 11.8%</td></tr>
 <tr><td>🧩 Strategy</td><td><code>idt strategy bull-call-spread NIFTY --width 4 --write</code></td><td>+26000 CE @ 156.87 / −26200 CE @ 73.73 → debit ₹5,404 · max profit ₹7,596 · BE 26,083</td></tr>
 <tr><td>🎯 Plan</td><td><code>idt exit plan --kind strategy --stop maxloss-pct:50 --target 1.5R --write</code></td><td>Stop −₹2,702 · target +₹4,053 per set (1.5 R)</td></tr>
-<tr><td>🎲 Odds</td><td><code>idt timemachine run</code></td><td>Target 9.5% · stop 28.4% · still open at 15:15 62.1%</td></tr>
+<tr><td>🎲 Odds</td><td><code>idt timemachine run</code></td><td>Target 8.9% · stop 29.0% · open at 15:15 62.1% → <b>“Strongly toward the stop”</b> (needs 40% of side hits at 1.5R, got 23%)</td></tr>
 <tr><td>🧮 Size</td><td><code>idt size --write</code></td><td>1 set (65 qty) · loss at stop ₹2,832 incl. ₹130 charges</td></tr>
 <tr><td>🛡️ Risk</td><td><code>idt risk check</code></td><td>✅ <b>PASS</b></td></tr>
-<tr><td>🧾 Ticket</td><td><code>idt ticket show</code></td><td>BUY 65 × 26000 CE LMT 156.87 → SELL 65 × 26200 CE LMT 73.73</td></tr>
+<tr><td>🧾 Ticket</td><td><code>idt ticket show</code></td><td>BUY 65 × 26000 CE LMT 156.90 → SELL 65 × 26200 CE LMT 73.70</td></tr>
 <tr><td>✍️ Confirm</td><td><code>idt ticket confirm &lt;hash&gt;</code></td><td>Logged. You place the order in your broker.</td></tr>
 </table>
 
@@ -348,8 +363,12 @@ idt init                                  # then set "max_loss_per_trade": 3000 
 
 ```bash
 idt exit plan --stop or-mid --target 1.5R --write
-# 26000 CE @ 156.87 · stop ≈ 132.04 (when NIFTY hits 25,945) · target ≈ 199.17 (NIFTY 26,070)
-# risk ₹1,614 per lot. The premium is repriced with Black-Scholes, anchored to the traded price.
+# 26000 CE @ 156.87 · stop ≈ 132.00 (when NIFTY hits 25,945) · target ≈ 199.15 (NIFTY 26,070)
+# risk ₹1,617 per lot, reward:risk 1.70. The premium is repriced with Black-Scholes, anchored to the
+# traded price, and rounded to the ₹0.05 tick.
+idt timemachine run
+# target first 39.4% · stop first 60.6% · history 12 target / 17 stop of 29
+# "Close to break-even: at 1.7R the target has to come first in 37% of the paths that hit a side; it did in 39%."
 ```
 
 </details>
@@ -363,7 +382,7 @@ idt exit plan --stop or-mid --target 1.5R --write
 | [`/idt-index`](skills/idt-index/SKILL.md) | Index board, levels, charts | `idt index` · `idt index NIFTY --html` · `--future` |
 | [`/idt-options`](skills/idt-options/SKILL.md) | Option chain analytics | `idt chain NIFTY --expiry monthly --chart` · `idt expiries SENSEX` |
 | [`/idt-strategy`](skills/idt-strategy/SKILL.md) | Build and analyse strategies | `idt strategy iron-condor NIFTY --delta 0.15` · `custom --leg +1x26000CE` |
-| [`/idt-scanner`](skills/idt-scanner/SKILL.md) | ORB · bull flag · oversold bounce | `idt scan orb --universe fno` |
+| [`/idt-scanner`](skills/idt-scanner/SKILL.md) | ORB · 20-day breakout · bull flag · 20-day reclaim · oversold · bounce | `idt scan orb --universe fno` |
 | [`/idt-entry`](skills/idt-entry/SKILL.md) | Waiting / triggered / expired | `idt entry watch NIFTY --write` |
 | [`/idt-exit`](skills/idt-exit/SKILL.md) | Stop and target before entry | `idt exit plan --stop or-mid --target 1.5R` |
 | [`/idt-timemachine`](skills/idt-timemachine/SKILL.md) | Monte Carlo + replay | `idt timemachine run` |
@@ -402,10 +421,10 @@ idt index [SYMBOL] [--interval 1|5|15|25|60] [--days N] [--html] [--future]
 idt expiries UNDERLYING
 idt chain UNDERLYING [--expiry near|next|monthly|YYYY-MM-DD] [--strikes N] [--chart]
 idt strategy NAME|custom|list [UNDERLYING] [--lots] [--offset] [--width] [--delta] [--leg …] [--chart] [--write]
-idt scan orb|flag|bounce [--universe fno|watchlist|indices|A,B,C] [--limit N]
-idt entry check|watch SYMBOL [--setup orb|pdh|level] [--above X] [--below Y] [--write]
+idt scan orb|daily|breakout|flag|reclaim|oversold|bounce [--universe fno|watchlist|indices|A,B,C] [--limit N]
+idt entry check|watch SYMBOL [--setup orb|pdh|level] [--above X] [--below Y] [--min-volume-x N] [--write]
 idt exit plan [--kind equity|future|option|strategy] [--stop RULE] [--target RULE] [--option CE|PE] [--strike-offset N] [--write]
-idt timemachine run [--paths N] [--seed N] [--days N]
+idt timemachine run [--paths N] [--seed N] [--days N] [--window N]
 idt size [--max-loss X] [--write]
 idt risk check
 idt ticket show | confirm HASH
@@ -486,10 +505,14 @@ idt charges --segment opt --buy 10196 --sell 12000
 | `mode` | `paper` | `live` reads available funds from Dhan |
 | `capital` | 100000 | Paper capital (₹) |
 | `max_loss_per_trade` | 1000 | Hard cap on loss at stop, including charges |
-| `daily_loss_cap` | 3000 | Blocks new trades once realised plus planned loss reaches this |
+| `daily_loss_cap` | 3000 | Blocks a new trade when the max loss of today's entries plus this one exceeds it |
 | `max_trades_per_day` | 5 | Confirmed tickets per day |
 | `or_minutes` | 15 | Opening-range length |
+| `no_entries_before` | 09:30 | No fresh entries while the opening range forms |
 | `entry_expiry` / `entry_cutoff` / `squareoff` | 11:30 / 15:00 / 15:15 | IST times |
+| `min_reward_risk` | 1.0 | Blocks a trade whose reward:risk at the current price is lower |
+| `min_volume_x` | off | Trigger bar volume ≥ N × the opening-range average |
+| `scan_min_price` / `scan_min_turnover_cr` | 50 / 25 | Scanner liquidity floor (₹, ₹ crore a day) |
 | `allow_short` / `allow_naked` | false / false | Permissions |
 | `block_expiry_day_selling` | true | No same-day-expiry short options |
 | `min_premium` | 5 | Avoid illiquid, far-OTM premiums |
@@ -547,7 +570,7 @@ implement the `MarketData` protocol in one file.
 
 ```bash
 uv pip install -e ".[dev]"
-pytest -q                                   # 58 tests, offline, a few seconds
+pytest -q                                   # 72 tests, offline, a few seconds
 python tests/fixtures/make_fixtures.py      # regenerate deterministic fixtures
 ```
 
