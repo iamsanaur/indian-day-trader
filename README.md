@@ -280,6 +280,19 @@ docker compose exec api idt dhan login                                   # or us
 The API listens only on `127.0.0.1:8742`. The public path is the tunnel, which serves HTTPS from
 Cloudflare's edge. State (config, journal, token) lives in the `idt-data` volume.
 
+**Updating** to a new release keeps the volume, so your config, journal and server token carry over:
+
+```bash
+git pull
+docker compose up -d --build api       # rebuilds indian-day-trader:<version>, restarts only the API
+docker compose ps                      # wait for "healthy"
+curl -s http://127.0.0.1:8742/api/health   # "version" shows the release you pulled
+docker image prune -f                  # optional: drop the previous image
+```
+
+New config keys arrive with their defaults; your `idt/config.json` only overrides what you set. The Dhan
+session token survives the restart, so no new TOTP is needed until it expires.
+
 ### Install the apps
 
 Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases/latest)

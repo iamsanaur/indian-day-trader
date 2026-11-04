@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — parity pass against the original day-trader-skill
+## 0.1.2 — 2026-11-04 — parity pass against the original day-trader-skill
 
 Rechecked every skill against [day-trader-skill](https://github.com/Jakeschincariol/day-trader-skill) and
 ported the behaviour that was missing or simplified away.
@@ -30,6 +30,8 @@ ported the behaviour that was missing or simplified away.
   rewritten with the original's structure: what each reads and writes, the exact rule, steps, a worked
   example on the fixture day, rules, what it never does, and safety. Research skills gained rules and safety.
 - 72 Python tests (14 new in `tests/test_parity.py`)
+- **Web**: Trade › Odds shows the verdict banner, green odds and history line; Trade › Size shows reward:risk
+- **Docker**: image `indian-day-trader:0.1.2`; README covers updating an existing deployment in place
 
 ## 0.1.1 — 2026-10-30
 
