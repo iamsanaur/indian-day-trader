@@ -39,6 +39,13 @@ DEFAULTS: dict[str, Any] = {
     "charges_override": {},
     "index_ids": {},                 # override Dhan IDX_I security ids, e.g. {"NIFTY": 13}
     "holidays": [],                  # extra YYYY-MM-DD trading holidays
+    "ai": {                          # local Ollama explanations; numbers always come from the engine
+        "enabled": True,
+        "host": "http://127.0.0.1:11434",   # or OLLAMA_HOST
+        "model": "deepseek-r1:1.5b",        # or IDT_AI_MODEL; `idt-trader` after `ollama create` (deploy/ollama)
+        "temperature": 0.3,
+        "timeout": 120,
+    },
     "nse_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 "
                       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36",
 }

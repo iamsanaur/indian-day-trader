@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0 — 2026-11-04 — local AI trade reasons
+
+- **`/idt-explain`** and `idt explain [--no-ai]`: the trade's reason in plain bullets, worded by a local Ollama
+  model (DeepSeek-R1 1.5B by default) from a fact sheet the engine computed. The model never calculates or
+  decides. Every number in its answer must be in the fact sheet, forbidden phrases ("guaranteed", "risk-free",
+  ...) and verdicts that contradict the risk gate are rejected, its hidden `<think>` text is dropped, and after
+  one retry it falls back to the engine's own explanation. `source` says which you got.
+- `idt ticket show --reason`, `idt ai status`; API `GET /api/explain?ai=true|false` and `GET /api/ai`
+- Web: **Why this trade** card on the ticket step (AI or engine-only, labelled)
+- `deploy/ollama/Modelfile` (`idt-trader`: low temperature, fixed seed) and an optional `ollama` service in
+  docker-compose (`--profile ai`); config `ai.enabled|host|model|temperature|timeout`, env `OLLAMA_HOST`,
+  `IDT_AI_MODEL`
+- 83 Python tests (11 new)
+
 ## 0.1.2 — 2026-11-04 — parity pass against the original day-trader-skill
 
 Rechecked every skill against [day-trader-skill](https://github.com/Jakeschincariol/day-trader-skill) and

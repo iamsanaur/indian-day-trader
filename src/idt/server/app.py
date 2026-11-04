@@ -226,6 +226,15 @@ def create_app(clock: Callable[[], datetime] | None = None, demo: bool = False) 
     def ticket():
         return ok(svc.ticket_show(clock()))
 
+    @app.get(f"{api}/explain", dependencies=guard)
+    def explain(ai: bool = True):
+        # The model only words the reason; every number is the engine's and is checked (see idt/ai.py).
+        return ok(svc.explain(data(), cfg(), clock(), use_ai=ai))
+
+    @app.get(f"{api}/ai", dependencies=guard)
+    def ai_status():
+        return ok(svc.ai_status(cfg()))
+
     @app.post(f"{api}/ticket/confirm", dependencies=guard)
     def confirm(body: ConfirmBody):
         if body.typed.strip().lower() != "yes":

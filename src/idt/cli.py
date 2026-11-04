@@ -97,9 +97,17 @@ def cmd_risk(args, cfg):
     emit(svc.risk(get_data(cfg), cfg, get_now(args)))
 
 
+def cmd_explain(args, cfg):
+    emit(svc.explain(get_data(cfg), cfg, get_now(args), use_ai=not args.no_ai))
+
+
+def cmd_ai(args, cfg):
+    emit(svc.ai_status(cfg))
+
+
 def cmd_ticket(args, cfg):
     if args.action == "show":
-        emit(svc.ticket_show(get_now(args)))
+        emit(svc.ticket_show(get_now(args), get_data(cfg) if args.reason else None, cfg, args.reason))
     else:
         emit(svc.ticket_confirm(cfg, get_now(args), args.hash or ""))
 
@@ -264,7 +272,16 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("ticket", help="broker-neutral order ticket")
     p.add_argument("action", choices=["show", "confirm"])
     p.add_argument("hash", nargs="?")
+    p.add_argument("--reason", action="store_true", help="add the AI explanation (verified against the engine's numbers)")
     p.set_defaults(fn=cmd_ticket)
+
+    p = sub.add_parser("explain", help="why this trade: engine facts explained by the local AI model")
+    p.add_argument("--no-ai", action="store_true", help="the engine's own explanation, no model call")
+    p.set_defaults(fn=cmd_explain)
+
+    p = sub.add_parser("ai", help="local Ollama model status")
+    p.add_argument("action", choices=["status"])
+    p.set_defaults(fn=cmd_ai)
 
     p = sub.add_parser("journal", help="trade journal")
     p.add_argument("action", choices=["show", "close"])

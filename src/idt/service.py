@@ -10,6 +10,7 @@ from datetime import date, datetime, timedelta
 
 import numpy as np
 
+from . import ai as ai_mod
 from . import alerts as alerts_mod
 from . import charges as chg
 from . import charts
@@ -32,7 +33,7 @@ MAIN_INDICES = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "INDIA
 # Config keys the apps may change. Data provider and paths stay CLI/file-only.
 EDITABLE_CONFIG = {"mode", "capital", "max_loss_per_trade", "daily_loss_cap", "max_trades_per_day", "leverage_cap",
                    "or_minutes", "entry_expiry", "entry_cutoff", "squareoff", "allow_short", "allow_naked",
-                   "block_expiry_day_selling", "min_premium", "stale_quote_seconds", "require_ban_check"}
+                   "block_expiry_day_selling", "min_premium", "stale_quote_seconds", "require_ban_check", "ai"}
 
 
 def jsonable(o):
@@ -496,11 +497,15 @@ def risk(data, cfg: dict, now: datetime) -> dict:
     return verdict
 
 
-def ticket_show(now: datetime) -> dict:
+def ticket_show(now: datetime, data=None, cfg: dict | None = None, reason: bool = False) -> dict:
     p, orders, r = _plan_or_die(), load_state("orders.json"), load_state("risk.json")
     if not orders:
         raise DataError("No idt/orders.json.")
-    return ticket_mod.build(p, orders, r, now)
+    t = ticket_mod.build(p, orders, r, now)
+    if reason and cfg is not None:
+        e = explain(data, cfg, now)
+        t["reason"] = {k: e.get(k) for k in ("reason", "source", "model", "note", "disclaimer")}
+    return t
 
 
 def ticket_confirm(cfg: dict, now: datetime, order_hash: str) -> dict:
@@ -521,6 +526,38 @@ def journal(now: datetime, close_pnl: float | None = None, symbol: str | None = 
     if close_pnl is not None:
         append_journal({"type": "close", "ts": now.isoformat(), "pnl": close_pnl, "symbol": symbol, "note": note})
     return read_journal()[-tail:]
+
+
+# --- AI explanations -------------------------------------------------------------------
+
+def ai_status(cfg: dict) -> dict:
+    s = ai_mod.settings(cfg)
+    return dict(ai_mod.ollama_status(s), enabled=s["enabled"])
+
+
+def explain(data, cfg: dict, now: datetime, use_ai: bool = True, chat=None) -> dict:
+    """Why this trade: engine facts from the saved pipeline state, explained by the local model (verified)."""
+    p = load_state("plan.json")
+    setup = load_state("setup.json")
+    if not p and not setup:
+        raise DataError("Nothing to explain yet. Run `idt entry check SYMBOL --write` and `idt exit plan --write`.")
+    if p and setup and setup.get("symbol") != p.get("symbol"):
+        setup = None
+    orders = load_state("orders.json")
+    if orders and p and (orders.get("symbol") != p.get("symbol") or orders.get("kind") != p.get("kind")):
+        orders = None
+    risk_v = load_state("risk.json")
+    if risk_v and (not orders or risk_v.get("order_hash") != orders.get("hash")):
+        risk_v = None
+    tmr = load_state("timemachine.json")
+    if p and (not tmr or (tmr.get("plan") or {}).get("symbol") != p.get("symbol")
+              or (tmr.get("plan") or {}).get("entry") != p.get("entry")):
+        try:
+            tmr = timemachine(data, cfg, now, paths=2000)
+        except (DataError, ValueError) as exc:
+            tmr = {"error": str(exc)}
+    f = ai_mod.facts(setup, p, tmr if tmr and "monte_carlo" in tmr else None, orders, risk_v)
+    return ai_mod.explain(f, cfg, chat=chat, use_ai=use_ai)
 
 
 # --- alerts ----------------------------------------------------------------------------

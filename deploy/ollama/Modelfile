@@ -1,0 +1,20 @@
+# idt-trader: DeepSeek-R1 1.5B tuned for short, grounded trade explanations.
+#   ollama pull deepseek-r1:1.5b
+#   ollama create idt-trader -f deploy/ollama/Modelfile
+#   then set "ai": {"model": "idt-trader"} in idt/config.json (or IDT_AI_MODEL=idt-trader)
+#
+# The model never computes trade numbers. idt sends it a fact sheet from the engine and rejects any
+# answer containing a number that is not in that sheet (src/idt/ai.py). These settings make it copy
+# rather than improvise: a low temperature, a fixed seed, and enough context for the fact sheet.
+FROM deepseek-r1:1.5b
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.9
+PARAMETER repeat_penalty 1.1
+PARAMETER num_ctx 4096
+PARAMETER num_predict 1024
+PARAMETER seed 7
+
+SYSTEM """You explain Indian intraday trades from a FACT SHEET computed by a trading engine. Use only
+numbers copied exactly from the fact sheet; never calculate new ones. The risk verdict (PASS or BLOCK) is
+final. Never promise profit. Not investment advice; the trader decides and places orders."""

@@ -75,3 +75,14 @@ def test_research(client):
 
 def test_pairing_uri():
     assert pairing_uri("http://192.168.1.5:8742", "a b") == "idt://pair?u=http%3A%2F%2F192.168.1.5%3A8742&t=a%20b"
+
+
+def test_explain_and_ai_status_over_http(client, monkeypatch):
+    monkeypatch.setenv("OLLAMA_HOST", "http://127.0.0.1:9")          # nothing listens: falls back
+    assert client.post("/api/entry/NIFTY", json={"write": True}).json()["state"] == "triggered"
+    assert client.post("/api/plan", json={"write": True}).status_code == 200
+    st = client.get("/api/ai").json()
+    assert st["reachable"] is False and st["model"] == "deepseek-r1:1.5b"
+    e = client.get("/api/explain").json()
+    assert e["source"] == "template" and "not reachable" in e["note"] and "25995" in e["reason"]
+    assert client.get("/api/explain?ai=false").json()["note"] == "AI explanations are off"

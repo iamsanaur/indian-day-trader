@@ -1,14 +1,20 @@
 # docker compose up -d --build
 #   api     the idt API + web app (state in the idt-data volume)
 #   tunnel  Cloudflare tunnel publishing the API (see deploy/cloudflared/config.example.yml)
+#   ollama  optional local AI for trade explanations: docker compose --profile ai up -d
+#           (see "AI explanations" in the README; without it, idt uses its own explanation)
 services:
   api:
     build: .
-    image: indian-day-trader:0.1.2
+    image: indian-day-trader:0.2.0
     restart: unless-stopped
     env_file: .env               # DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN (never committed)
     environment:
       IDT_PUBLIC_URL: ${IDT_PUBLIC_URL:-}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://ollama:11434}   # Ollama on the host instead: http://host.docker.internal:11434
+      IDT_AI_MODEL: ${IDT_AI_MODEL:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - idt-data:/data
     ports:
@@ -24,5 +30,15 @@ services:
       api:
         condition: service_healthy
 
+  ollama:
+    image: ollama/ollama:0.9.0
+    profiles: ["ai"]
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+      - ./deploy/ollama:/modelfiles:ro
+    # No published port: only the api container talks to it, over the compose network.
+
 volumes:
   idt-data:
+  ollama-models:

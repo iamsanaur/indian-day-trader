@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml/badge.svg)](https://github.com/iamsanaur/indian-day-trader/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-72%20passing-1a9c5b)
+![Tests](https://img.shields.io/badge/tests-83%20passing-1a9c5b)
 ![Apps](https://img.shields.io/badge/apps-web%20·%20iOS%20·%20Android-4f46e5)
 ![Data](https://img.shields.io/badge/data-Dhan%20v2%20API-5b4bff)
 [![Release](https://img.shields.io/github/v/release/iamsanaur/indian-day-trader?color=4f46e5)](https://github.com/iamsanaur/indian-day-trader/releases/latest)
@@ -293,6 +293,29 @@ docker image prune -f                  # optional: drop the previous image
 New config keys arrive with their defaults; your `idt/config.json` only overrides what you set. The Dhan
 session token survives the restart, so no new TOTP is needed until it expires.
 
+### 🤖 AI explanations (local Ollama)
+
+`idt explain` (and **Why this trade** on the web ticket) puts the trade's reason into words with a local
+model, DeepSeek-R1 1.5B by default. The model never computes or decides anything: the engine computes
+every number and the PASS/BLOCK verdict, and the model only words them. Every number in its answer is
+checked against the engine's fact sheet, along with phrases like "guaranteed" and the risk verdict. If
+the answer fails twice, or Ollama is not running, you get the engine's own explanation instead. Nothing
+leaves your machine.
+
+```bash
+# Docker: start the optional ollama service and pull the model once
+docker compose --profile ai up -d
+docker compose exec ollama ollama pull deepseek-r1:1.5b
+docker compose exec ollama ollama create idt-trader -f /modelfiles/Modelfile   # optional tuned settings
+echo IDT_AI_MODEL=idt-trader >> .env && docker compose up -d api              # if you created it
+
+# Without Docker
+ollama pull deepseek-r1:1.5b && idt ai status && idt explain
+```
+
+Ollama already running on the Docker host instead? Set `OLLAMA_HOST=http://host.docker.internal:11434`
+in `.env`. Config: `"ai": {"enabled", "host", "model", "temperature", "timeout"}` in `idt/config.json`.
+
 ### Install the apps
 
 Signed builds are attached to each [GitHub release](https://github.com/iamsanaur/indian-day-trader/releases/latest)
@@ -388,7 +411,8 @@ idt timemachine run
 | [`/idt-timemachine`](skills/idt-timemachine/SKILL.md) | Monte Carlo + replay | `idt timemachine run` |
 | [`/idt-budget`](skills/idt-budget/SKILL.md) | Lots, margin, charges | `idt size --write` · `idt charges --segment opt …` |
 | [`/idt-risk`](skills/idt-risk/SKILL.md) | PASS / BLOCK | `idt risk check` · `idt status` |
-| [`/idt-broker`](skills/idt-broker/SKILL.md) | Broker-neutral ticket | `idt ticket show` · `idt ticket confirm <hash>` |
+| [`/idt-explain`](skills/idt-explain/SKILL.md) | Trade reason by local AI, numbers verified | `idt explain` · `idt ai status` |
+| [`/idt-broker`](skills/idt-broker/SKILL.md) | Broker-neutral ticket | `idt ticket show [--reason]` · `idt ticket confirm <hash>` |
 | [`/idt-alerts`](skills/idt-alerts/SKILL.md) | Stop / target / P&L / square-off | `idt alerts add --from-plan` · `idt alerts watch` |
 | [`/idt-news`](skills/idt-news/SKILL.md) | NSE announcements, ban list | `idt news --hours 24` · `idt ban` |
 | [`/idt-analyst`](skills/idt-analyst/SKILL.md) | Quarterly results, QoQ/YoY | `idt results TCS` |
@@ -427,7 +451,9 @@ idt exit plan [--kind equity|future|option|strategy] [--stop RULE] [--target RUL
 idt timemachine run [--paths N] [--seed N] [--days N] [--window N]
 idt size [--max-loss X] [--write]
 idt risk check
-idt ticket show | confirm HASH
+idt explain [--no-ai]                     # why this trade (local Ollama model, numbers checked)
+idt ai status
+idt ticket show [--reason] | confirm HASH
 idt journal show | close --pnl X
 idt alerts add|check|watch|list|clear [--from-plan] [--symbol S --above X --below Y]
 idt news [--symbols A,B] [--hours N] · idt ban · idt results SYMBOL · idt insider deals|pit
@@ -527,7 +553,7 @@ idt charges --segment opt --buy 10196 --sell 12000
 ```mermaid
 flowchart LR
     subgraph Claude["Claude Code"]
-      S[14 SKILL.md files]
+      S[15 SKILL.md files]
     end
     subgraph Engine["idt Python package"]
       CLI[idt CLI] --> CORE[indicators · fno · strategy<br/>plan · sizing · risk · ticket<br/>timemachine · charts]
@@ -570,7 +596,7 @@ implement the `MarketData` protocol in one file.
 
 ```bash
 uv pip install -e ".[dev]"
-pytest -q                                   # 72 tests, offline, a few seconds
+pytest -q                                   # 83 tests, offline, a few seconds
 python tests/fixtures/make_fixtures.py      # regenerate deterministic fixtures
 ```
 
@@ -583,7 +609,8 @@ example end to end.
 
 ## 🗺️ Roadmap
 
-- [x] 14 skills, Dhan adapter, offline fixtures, CI
+- [x] 15 skills, Dhan adapter, offline fixtures, CI
+- [x] Local AI trade explanations (Ollama, numbers verified against the engine)
 - [x] Self-hosted API server (FastAPI) with QR pairing and live alerts
 - [x] Web app (React + Vite), native iOS (SwiftUI) and Android (Jetpack Compose) apps
 - [ ] Push notifications (APNs / FCM) when the app is closed

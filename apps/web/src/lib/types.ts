@@ -248,3 +248,12 @@ export interface JournalEntry {
   note?: string;
   mode?: string;
 }
+
+export interface Explanation {
+  reason: string;
+  source: "ai" | "template";
+  model: string;
+  note?: string;
+  disclaimer: string;
+  attempts?: number;
+}

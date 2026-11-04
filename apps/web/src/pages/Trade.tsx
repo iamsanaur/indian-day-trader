@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../lib/api";
-import type { Orders, Plan, RiskVerdict, Ticket, TimeMachine } from "../lib/types";
+import type { Explanation, Orders, Plan, RiskVerdict, Ticket, TimeMachine } from "../lib/types";
 import { num, rupees, signedRupees, time } from "../lib/format";
 import { Badge, Card, ErrorBox, Icons, Loading, PageHead, Spinner, Stat } from "../ui";
 
@@ -297,6 +297,33 @@ function RiskStep({ next }: { next: () => void }) {
   );
 }
 
+function WhyCard() {
+  const why = useMutation({ mutationFn: (ai: boolean) => api<Explanation>(`/explain?ai=${ai}`) });
+  const e = why.data;
+  return (
+    <Card title="Why this trade" right={e && <Badge tone={e.source === "ai" ? "accent" : "warn"}>{e.source === "ai" ? `AI · ${e.model} · numbers verified` : "Engine explanation"}</Badge>}>
+      {!e && !why.isPending && (
+        <div className="row">
+          <button className="btn btn-sm btn-primary" onClick={() => why.mutate(true)}>Explain with local AI</button>
+          <button className="btn btn-sm" onClick={() => why.mutate(false)}>Engine only</button>
+          <span className="small muted">The model words the reason; every number comes from the engine and is checked.</span>
+        </div>
+      )}
+      {why.isPending && <div className="row"><Spinner /><span className="small muted">Asking the local model (can take a while on CPU)…</span></div>}
+      <ErrorBox error={why.error} />
+      {e && (
+        <div className="stack">
+          <ul className="small" style={{ margin: 0, paddingLeft: 18 }}>
+            {e.reason.split("\n").map((l) => l.replace(/^\s*[-*•]\s*/, "").trim()).filter(Boolean).map((l, i) => <li key={i}>{l}</li>)}
+          </ul>
+          {e.note && <p className="small muted" style={{ margin: 0 }}>{e.note}</p>}
+          <p className="small muted" style={{ margin: 0 }}>{e.disclaimer}</p>
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function TicketStep() {
   const qc = useQueryClient();
   const [typed, setTyped] = useState("");
@@ -329,6 +356,7 @@ function TicketStep() {
           <Stat k="Margin" v={rupees(k.margin.total)} />
         </div>
       </Card>
+      <WhyCard />
       {confirm.data ? (
         <div className="banner pass">
           <div>

@@ -55,7 +55,9 @@ idt alerts add --from-plan       # then watch the stop, target and square-off
    Anything else ("ok", "sure", "go", silence, a yes for another hash) means no.
 4. On yes: `idt ticket confirm <hash>`. Paper mode records a paper fill at the planned prices. Live
    mode: remind the user to place it in their broker now; nothing has been sent.
-5. Offer `/idt-alerts` (`idt alerts add --from-plan`) for the stop, the target and the square-off.
+5. If the user wants the reason behind it, `idt ticket show --reason` (or `/idt-explain`) adds the
+   explanation. Show it as returned; never add numbers to it.
+6. Offer `/idt-alerts` (`idt alerts add --from-plan`) for the stop, the target and the square-off.
 
 ## Example (fixtures, 2026-10-29 09:45)
 
